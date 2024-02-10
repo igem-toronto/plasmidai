@@ -16,7 +16,6 @@ class TrainLLMConfig(LitLLMConfig):
     seed: int = 100
 
     accelerator: str = "cpu"
-    num_nodes: int = 1
     devices: int = 1
     strategy: Optional[str] = "auto"
 
@@ -106,7 +105,6 @@ def train(config: TrainLLMConfig):
 
     trainer = pl.Trainer(
         accelerator=cfg.accelerator,
-        num_nodes=cfg.num_nodes,
         devices=cfg.devices,
         precision=cfg.precision,
         strategy=cfg.strategy,
