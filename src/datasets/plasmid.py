@@ -14,7 +14,7 @@ class PlasmidDataset(Dataset):
         super().__init__()
 
         self.records = list(records)
-        self.Lmax = max(len(r.seq) for r in records)
+        self.Lmax = max(len(r.seq) for r in self.records)
 
     def __len__(self):
         return len(self.records)
