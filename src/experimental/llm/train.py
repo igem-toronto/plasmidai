@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 import lightning.pytorch as pl
 import pydantic_cli
@@ -19,6 +19,8 @@ class TrainLLMConfig(LitLLMConfig):
     num_nodes: int = 1
     devices: int = 1
     strategy: Optional[str] = "auto"
+
+    precision: Literal["32", "16-mixed", "bf16-mixed"] = "32"
 
     # =================
     # Datamodule Fields
@@ -106,6 +108,7 @@ def train(config: TrainLLMConfig):
         accelerator=cfg.accelerator,
         num_nodes=cfg.num_nodes,
         devices=cfg.devices,
+        precision=cfg.precision,
         strategy=cfg.strategy,
         callbacks=callbacks,
         enable_checkpointing=cfg.checkpoint,
