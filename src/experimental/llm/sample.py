@@ -49,11 +49,15 @@ class LLMSampler(pl.LightningModule):
         self.model.eval()
 
     def predict_step(self, batch):
-        cfg = self.config
+        input_ids = torch.full(
+            [batch.shape[0], 1], self.model.sos,
+            dtype=torch.long,
+            device=self.device,
+        )
 
-        sos = torch.full([batch.shape[0], 1], self.model.sos, device=self.device)
+        cfg = self.config
         samples = self.model.generate(
-            input_ids=sos,
+            input_ids=input_ids,
             max_length=cfg.sample_max_length,
             top_k=cfg.sample_top_k,
             top_p=cfg.sample_top_p,
