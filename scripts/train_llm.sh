@@ -16,7 +16,7 @@ conda activate plasmid-ai
 
 cd ..
 
-srun python -m src.experimental.train \
+srun python -m src.experimental.llm.train \
   --accelerator=gpu \
   --devices=2 \
   --precision=bf16-mixed \
