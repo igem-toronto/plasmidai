@@ -1,7 +1,7 @@
 import torch
 
-BASE_TO_ONEHOT = torch.full([90], -100, dtype=torch.int)
-BASE_TO_ONEHOT[[ord(base) for base in "ACGT"]] = torch.arange(4).int()
+BASE_TO_ONEHOT = torch.full([90], -100, dtype=torch.long)
+BASE_TO_ONEHOT[[ord(base) for base in "ACGT"]] = torch.arange(4).long()
 
 
 def onehot_dna(sequence):
