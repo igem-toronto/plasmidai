@@ -51,7 +51,7 @@ class LLMSampler(pl.LightningModule):
     def predict_step(self, batch):
         cfg = self.config
 
-        sos = torch.full([batch.shape[0], 1], self.model.sos, self.device)
+        sos = torch.full([batch.shape[0], 1], self.model.sos, device=self.device)
         samples = self.model.generate(
             input_ids=sos,
             max_length=cfg.sample_max_length,
