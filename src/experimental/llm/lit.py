@@ -61,6 +61,9 @@ class LitLLM(pl.LightningModule):
             )
         )
 
+    def generate(self, *args, **kwargs):
+        return self.mamba.generate(*args, **kwargs)
+
     def configure_optimizers(self):
         cfg = self.config
         optimizer, scheduler = build_optimizer_and_scheduler(

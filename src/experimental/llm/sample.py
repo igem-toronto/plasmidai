@@ -80,7 +80,7 @@ def sample(config: LLMSampleConfig):
 
     # Load checkpoint
     model = LitLLM.load_from_checkpoint(cfg.checkpoint_path, map_location="cpu")
-    model = LLMSampler(cfg, model.mamba)
+    model = LLMSampler(cfg, model)
 
     # Load dataset
     predict_loader = DataLoader(
