@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from Bio import SeqIO
 from torch.utils.data import DataLoader, Dataset, random_split
 
-from src.datasets.utils import onehot_dna, random_roll
+from src.utils import dna_to_tensor, random_roll
 from src.paths import DATA_ROOT
 
 
@@ -23,7 +23,7 @@ class PlasmidDataset(Dataset):
         record = self.records[idx]
 
         # A=0 C=1 G=2 T=3
-        sequence = onehot_dna(str(record.seq))
+        sequence = dna_to_tensor(str(record.seq))
         sequence = random_roll(sequence)
         mask = torch.full_like(sequence, True, dtype=torch.bool)
 

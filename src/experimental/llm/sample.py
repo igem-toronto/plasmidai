@@ -9,6 +9,7 @@ import torch.backends.cudnn
 from torch.utils.data import DataLoader
 
 from src.experimental.llm.lit import LitLLM
+from src.utils import tensor_to_dna
 
 
 class LLMSampleConfig(pydantic.BaseModel):
@@ -60,9 +61,9 @@ class LLMSampler(pl.LightningModule):
             vocab_size=(4 + 1),  # exclude sos
             eos_token_id=self.model.eos,
         )
-
-        print(samples, samples.shape, samples.dtype)
-        exit()
+        samples = samples[..., 1:]  # remove sos
+        samples = [tensor_to_dna(x, eos=self.model.eos) for x in samples]
+        return samples
 
 
 def sample(config: LLMSampleConfig):
