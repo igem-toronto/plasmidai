@@ -35,6 +35,8 @@ class TrainLLMConfig(LitLLMConfig):
     # ===============
 
     max_epochs: int = 1500
+    train_steps_per_epoch: int = 50
+    val_steps_per_epoch: int = 50
 
     resume_path: Optional[str] = None
 
@@ -112,6 +114,8 @@ def train(config: TrainLLMConfig):
         enable_checkpointing=cfg.checkpoint,
         logger=logger,
         max_epochs=cfg.max_epochs,
+        limit_train_batches=cfg.train_steps_per_epoch,
+        limit_val_batches=cfg.val_steps_per_epoch,
         log_every_n_steps=cfg.log_every_n_steps,
         enable_progress_bar=cfg.progress_bar,
         use_distributed_sampler=True,
