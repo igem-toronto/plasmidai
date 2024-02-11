@@ -12,7 +12,7 @@ from src.paths import LOG_DIR, random_checkpoint_dir
 
 
 class TrainLLMConfig(LitLLMConfig):
-    #
+
     seed: int = 100
 
     accelerator: str = "cpu"
