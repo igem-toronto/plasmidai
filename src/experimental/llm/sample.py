@@ -6,6 +6,9 @@ import pydantic_cli
 import torch
 import torch.backends.cuda
 import torch.backends.cudnn
+from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
 from torch.utils.data import DataLoader
 
 from src.experimental.llm.lit import LitLLM
@@ -102,9 +105,16 @@ def sample(config: LLMSampleConfig):
         use_distributed_sampler=True,
     )
 
-    # Start predicting
+    # Sample
     samples = trainer.predict(model, dataloaders=predict_loader)
-    print(samples)
+    samples = sum(samples, [])  # flatten
+
+    # Write to fasta
+    records = []
+    for i, plasmid in enumerate(samples):
+        r = SeqRecord(seq=Seq(plasmid), id=f"sample_{i}")
+        records.append(r)
+    SeqIO.write(records, cfg.samples_path, "fasta")
 
     return 0
 
