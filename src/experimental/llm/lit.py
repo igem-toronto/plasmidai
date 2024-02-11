@@ -97,7 +97,7 @@ class LitLLM(pl.LightningModule):
         mask = F.pad(mask, (1, 0), value=True)
 
         # Forward pass
-        logits = self.mamba(inputs, num_last_tokens=1).logits  # (B L+1 6)
+        logits = self.mamba(inputs).logits  # (B L+1 6)
         logits = logits[..., :-1]  # don't compute loss on SOS
         logits = logits.mT  # (B 5 L+1)
 
