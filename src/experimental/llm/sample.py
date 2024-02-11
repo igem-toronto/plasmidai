@@ -51,7 +51,7 @@ class LLMSampler(pl.LightningModule):
     def predict_step(self, batch):
         cfg = self.config
         samples = self.model.generate(
-            input_ids=input_ids,
+            input_ids=batch,
             max_length=cfg.sample_max_length,
             top_k=cfg.sample_top_k,
             top_p=cfg.sample_top_p,
