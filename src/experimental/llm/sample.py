@@ -17,7 +17,7 @@ class LLMSampleConfig(pydantic.BaseModel):
     checkpoint_path: str
 
     accelerator: Literal["cpu", "gpu"] = "cpu"
-    precision: Literal["32", "16-mixed", "bf16-mixed"] = "bf16-mixed"
+    precision: Literal["32", "16-mixed", "bf16-mixed"] = "32"
 
     # =============
     # Sample Fields
