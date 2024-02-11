@@ -49,12 +49,6 @@ class LLMSampler(pl.LightningModule):
         self.model.eval()
 
     def predict_step(self, batch):
-        input_ids = torch.full(
-            [batch.shape[0], 1], self.model.sos,
-            dtype=torch.long,
-            device=self.device,
-        )
-
         cfg = self.config
         samples = self.model.generate(
             input_ids=input_ids,
@@ -83,12 +77,12 @@ def sample(config: LLMSampleConfig):
     pl.seed_everything(cfg.seed, workers=True)
 
     # Load checkpoint
-    model = LitLLM.load_from_checkpoint(cfg.checkpoint_path, map_location="cpu")
-    model = LLMSampler(cfg, model)
+    lit = LitLLM.load_from_checkpoint(cfg.checkpoint_path, map_location="cpu")
+    model = LLMSampler(cfg, lit)
 
     # Load dataset
     predict_loader = DataLoader(
-        dataset=list(range(cfg.num_samples)),
+        dataset=torch.full([cfg.num_samples, 1], lit.sos, dtype=torch.long),
         batch_size=cfg.batch_size,
         shuffle=False,
         drop_last=False,
