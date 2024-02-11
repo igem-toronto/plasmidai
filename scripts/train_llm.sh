@@ -19,7 +19,7 @@ cd ..
 srun python -m src.experimental.llm.train \
   --accelerator=gpu \
   --devices=2 \
-  --precision=bf16-mixed \
+  --precision=16-mixed \
   --batch_size=32 \
   --num_workers=4 \
   --enable_fused_add_norm \
