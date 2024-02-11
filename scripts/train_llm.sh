@@ -6,8 +6,8 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32GB
 #SBATCH --partition=rtx6000
-#SBATCH --qos=long
-#SBATCH --time=2-00:00:00
+#SBATCH --qos=normal
+#SBATCH --time=16:00:00
 #SBATCH --export=ALL
 #SBATCH --output=logs/slurm-%j.out
 
