@@ -21,6 +21,7 @@ srun python -m src.experimental.train \
   --devices=2 \
   --precision=bf16-mixed \
   --batch_size=32 \
+  --num_workers=4 \
   --enable_fused_add_norm \
   --enable_wandb \
   --enable_checkpoint --checkpoint_dir /checkpoint/${USER}/${SLURM_JOB_ID}
