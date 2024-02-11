@@ -25,7 +25,7 @@ class TrainLLMConfig(LitLLMConfig):
     # Datamodule Fields
     # =================
 
-    batch_size: int = 512
+    batch_size: int = 32
     num_workers: int = 8
     split_ratio: List[float] = (0.8, 0.1, 0.1)
     split_by: str = "random"
