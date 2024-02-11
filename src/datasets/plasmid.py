@@ -62,7 +62,7 @@ class PlasmidDataModule(pl.LightningDataModule):
             raise NotImplementedError()
 
     def train_dataloader(self):
-        return self._loader(self.train_set, shuffle=True, drop_last=True)
+        return self._loader(self.train_set)
 
     def val_dataloader(self):
         return self._loader(self.valid_set)
@@ -70,7 +70,7 @@ class PlasmidDataModule(pl.LightningDataModule):
     def test_dataloader(self):
         return self._loader(self.test_set)
 
-    def _loader(self, dataset, shuffle=False, drop_last=False):
+    def _loader(self, dataset, shuffle=True, drop_last=True):
         return DataLoader(
             dataset=dataset,
             batch_size=self.batch_size,
