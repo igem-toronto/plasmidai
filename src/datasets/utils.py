@@ -1,12 +1,34 @@
 import torch
 
-BASE_TO_ONEHOT = torch.full([90], -100, dtype=torch.long)
-BASE_TO_ONEHOT[[ord(base) for base in "ACGT"]] = torch.arange(4).long()
+LETTER_TO_BASES = {
+    "A": "A",
+    "B": "CGT",
+    "C": "C",
+    "D": "AGT",
+    "G": "G",
+    "H": "ACT",
+    "K": "GT",
+    "M": "AC",
+    "N": "ACGT",
+    "R": "AG",
+    "S": "CG",
+    "T": "T",
+    "V": "ACG",
+    "W": "AT",
+    "Y": "CT",
+}
+
+BASE_TO_INDEX = {b: i for i, b in enumerate("ACGT")}
 
 
 def onehot_dna(sequence):
-    sequence = sequence.encode("ascii")
-    return BASE_TO_ONEHOT[memoryview(sequence)]
+    onehot = []
+    for x in sequence:
+        choices = LETTER_TO_BASES[x]
+        i = torch.randint(len(choices), size=[1]).item()
+        base = choices[i]
+        onehot.append(BASE_TO_INDEX[base])
+    return torch.tensor(onehot, dtype=torch.long)
 
 
 def random_roll(sequence):
