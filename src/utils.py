@@ -18,17 +18,30 @@ LETTER_TO_BASES = {
     "Y": "CT",
 }
 
-BASE_TO_INDEX = {b: i for i, b in enumerate("ACGT")}
+INDEX_TO_BASE = "ACGT"
+BASE_TO_INDEX = {b: i for i, b in enumerate(INDEX_TO_BASE)}
 
 
-def onehot_dna(sequence):
-    onehot = []
-    for x in sequence:
+def dna_to_tensor(dna):
+    sequence = []
+    for x in dna:
         choices = LETTER_TO_BASES[x]
         i = torch.randint(len(choices), size=[1]).item()
         base = choices[i]
-        onehot.append(BASE_TO_INDEX[base])
-    return torch.tensor(onehot, dtype=torch.long)
+        sequence.append(BASE_TO_INDEX[base])
+    return torch.tensor(sequence, dtype=torch.long)
+
+
+def tensor_to_dna(sequence, eos):
+    assert sequence.ndim == 1
+    assert eos not in BASE_TO_INDEX.values()
+    dna = []
+    for idx in sequence:
+        idx = idx.item()
+        if idx == eos:
+            break
+        dna.append(INDEX_TO_BASE[idx])
+    return "".join(dna)
 
 
 def random_roll(sequence):
