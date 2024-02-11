@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH --job-name=train_edm
+#SBATCH --job-name=train
 #SBATCH --ntasks=1
-#SBATCH --gpus-per-task=2
+#SBATCH --gpus-per-task=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32GB
 #SBATCH --partition=rtx6000
@@ -18,10 +18,10 @@ cd ..
 
 srun python -m src.experimental.llm.train \
   --accelerator=gpu \
-  --devices=2 \
+  --devices=1 \
   --precision=16-mixed \
   --batch_size=32 \
-  --num_workers=4 \
+  --num_workers=8 \
   --enable_fused_add_norm \
   --enable_wandb \
   --enable_checkpoint --checkpoint_dir /checkpoint/${USER}/${SLURM_JOB_ID}
