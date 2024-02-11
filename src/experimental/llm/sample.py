@@ -112,7 +112,7 @@ def sample(config: LLMSampleConfig):
     # Write to fasta
     records = []
     for i, plasmid in enumerate(samples):
-        r = SeqRecord(seq=Seq(plasmid), id=f"sample_{i}")
+        r = SeqRecord(seq=Seq(plasmid), id=f"sample_{i}", description="")
         records.append(r)
     SeqIO.write(records, cfg.samples_path, "fasta")
 
