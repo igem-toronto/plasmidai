@@ -25,10 +25,11 @@ class TrainLLMConfig(LitLLMConfig):
     # Datamodule Fields
     # =================
 
+    plasmid_length: int = 10000
+
     batch_size: int = 32
     num_workers: int = 8
-    split_ratio: List[float] = (0.8, 0.1, 0.1)
-    split_by: str = "random"
+    finetune: bool = False
 
     # ===============
     # Training Fields
@@ -67,11 +68,10 @@ def train(config: TrainLLMConfig):
 
     # Load dataset
     data = PlasmidDataModule(
-        seed=cfg.seed,
+        Lmax=cfg.plasmid_length,
         batch_size=cfg.batch_size,
         num_workers=cfg.num_workers,
-        split_ratio=cfg.split_ratio,
-        split_by=cfg.split_by,
+        finetune=cfg.finetune,
     )
 
     # Initialize trainer
