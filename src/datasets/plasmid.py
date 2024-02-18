@@ -1,20 +1,21 @@
 import lightning.pytorch as pl
+import pandas as pd
 import torch
 import torch.nn.functional as F
 from Bio import SeqIO
-from torch.utils.data import DataLoader, Dataset, random_split
+from torch.utils.data import DataLoader, Dataset
 
-from src.utils import dna_to_tensor, random_roll
 from src.paths import DATA_ROOT
+from src.utils import dna_to_tensor, random_circular_crop
 
 
 class PlasmidDataset(Dataset):
 
-    def __init__(self, records):
+    def __init__(self, records, Lmax):
         super().__init__()
 
         self.records = list(records)
-        self.Lmax = max(len(r.seq) for r in self.records)
+        self.Lmax = Lmax
 
     def __len__(self):
         return len(self.records)
@@ -23,8 +24,8 @@ class PlasmidDataset(Dataset):
         record = self.records[idx]
 
         # A=0 C=1 G=2 T=3
-        sequence = dna_to_tensor(str(record.seq))
-        sequence = random_roll(sequence)
+        sequence = random_circular_crop(str(record.seq), Lmax=self.Lmax)
+        sequence = dna_to_tensor(sequence)
         mask = torch.full_like(sequence, True, dtype=torch.bool)
 
         # Padding & mask
@@ -38,41 +39,36 @@ class PlasmidDataset(Dataset):
 
 class PlasmidDataModule(pl.LightningDataModule):
 
-    def __init__(
-        self,
-        seed=0,
-        batch_size=10,
-        num_workers=0,
-        split_ratio=(0.8, 0.1, 0.1),
-        split_by="random",
-    ):
+    def __init__(self, Lmax=10000, batch_size=10, num_workers=0, finetune=False):
         super().__init__()
 
         self.batch_size = batch_size
         self.num_workers = num_workers
 
         records = SeqIO.parse(DATA_ROOT / f"plasmids.fasta", "fasta")
-        self.base = PlasmidDataset(records)
+        records = {r.id: r for r in records}
 
-        if split_by == "random":
-            g = torch.Generator().manual_seed(seed)
-            splits = random_split(self.base, split_ratio, generator=g)
-            self.train_set, self.valid_set, self.test_set = splits
-        else:
-            raise NotImplementedError()
+        df = pd.read_csv(DATA_ROOT / "splits.csv")
+        if finetune:
+            df = df[df["finetune"]]
+
+        self.datasets = {}
+        for split, group in df.groupby("split"):
+            examples = [records[k] for k in group["id"]]
+            self.datasets[split] = PlasmidDataset(examples, Lmax=Lmax)
 
     def train_dataloader(self):
-        return self._loader(self.train_set)
+        return self._loader(split="train")
 
     def val_dataloader(self):
-        return self._loader(self.valid_set)
+        return self._loader(split="val")
 
     def test_dataloader(self):
-        return self._loader(self.test_set)
+        return self._loader(split="test")
 
-    def _loader(self, dataset, shuffle=True, drop_last=True):
+    def _loader(self, split, shuffle=True, drop_last=True):
         return DataLoader(
-            dataset=dataset,
+            dataset=self.datasets[split],
             batch_size=self.batch_size,
             shuffle=shuffle,
             drop_last=drop_last,

@@ -44,7 +44,11 @@ def tensor_to_dna(sequence, eos):
     return "".join(dna)
 
 
-def random_roll(sequence):
-    assert sequence.ndim == 1
-    shift = torch.randint(sequence.shape[0], size=[1]).item()
-    return torch.roll(sequence, shifts=shift, dims=0)
+def random_circular_crop(dna, Lmax):
+    start = torch.randint(len(dna), size=[1]).item()
+    L = min(len(dna), Lmax)
+    crop = dna[start:(start + L)]
+    overhang = L - len(crop)  # wrap around to start
+    crop = crop + dna[:overhang]
+    assert len(crop) == L
+    return crop
