@@ -1,0 +1,25 @@
+name: plasmid-ai
+channels:
+  - conda-forge
+  - pytorch
+  - nvidia
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.9
+  - pytorch=2.1.2
+  - pytorch-cuda=11.8
+  - cuda=11.8
+  - packaging
+  - ninja
+  - cxx-compiler
+  - gxx=11
+  - lightning
+  - wandb
+  - pydantic<2
+  - pydantic-cli
+  - einops
+  - scipy
+  - biopython
+  - mmseqs2
+  - pip
