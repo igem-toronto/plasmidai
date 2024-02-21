@@ -1,9 +1,9 @@
 from typing import Literal, Optional
 
-import lightning.pytorch as pl
 import pydantic_cli
-from lightning.pytorch.callbacks import LearningRateMonitor, ModelCheckpoint, ModelSummary
-from lightning.pytorch.loggers import WandbLogger
+import pytorch_lightning as pl
+from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint, ModelSummary
+from pytorch_lightning.loggers import WandbLogger
 
 from src.datasets import PlasmidDataModule
 from src.experimental.callbacks import GradNormCallback

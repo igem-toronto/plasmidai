@@ -1,5 +1,5 @@
-import lightning.pytorch as pl
-import lightning.pytorch.utilities
+import pytorch_lightning as pl
+import pytorch_lightning.utilities
 
 
 class GradNormCallback(pl.Callback):

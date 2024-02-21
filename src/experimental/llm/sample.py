@@ -1,8 +1,8 @@
 from typing import Literal
 
-import lightning.pytorch as pl
 import pydantic
 import pydantic_cli
+import pytorch_lightning as pl
 import torch
 import torch.backends.cuda
 import torch.backends.cudnn
