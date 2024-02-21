@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional
+from typing import Literal, Optional
 
 import lightning.pytorch as pl
 import pydantic_cli
