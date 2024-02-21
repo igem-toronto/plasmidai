@@ -72,11 +72,6 @@ class LLMSampler(pl.LightningModule):
 def sample(config: LLMSampleConfig):
     cfg = config
 
-    # Torch settings
-    if cfg.accelerator == "gpu":
-        torch.backends.cuda.matmul.allow_tf32 = True
-        torch.backends.cudnn.allow_tf32 = True
-
     # Seeding
     pl.seed_everything(cfg.seed, workers=True)
 
