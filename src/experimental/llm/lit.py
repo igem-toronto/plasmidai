@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Literal
 
-import lightning.pytorch as pl
 import pydantic
+import pytorch_lightning as pl
 import torch
 import torch.nn.functional as F
 from mamba_ssm.models.mixer_seq_simple import MambaConfig, MambaLMHeadModel

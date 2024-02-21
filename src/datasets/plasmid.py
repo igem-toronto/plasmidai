@@ -1,5 +1,5 @@
-import lightning.pytorch as pl
 import pandas as pd
+import pytorch_lightning as pl
 import torch
 import torch.nn.functional as F
 from Bio import SeqIO
