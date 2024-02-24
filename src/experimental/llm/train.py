@@ -36,7 +36,7 @@ class TrainLLMConfig(LitLLMConfig):
     # Training Fields
     # ===============
 
-    max_epochs: int = 1500
+    max_epochs: int = -1
     train_steps_per_epoch: int = 50
     val_steps_per_epoch: int = 50
 
