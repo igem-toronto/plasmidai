@@ -6,8 +6,7 @@ REPO_ROOT = CODE_ROOT.parent
 DATA_ROOT = REPO_ROOT / "data"
 
 LOG_DIR = REPO_ROOT / "logs"
-if not LOG_DIR.exists():  # in case LOG_DIR is a symlink
-    LOG_DIR.mkdir(exist_ok=True, parents=True)
+LOG_DIR.mkdir(exist_ok=True, parents=True)
 
 
 def random_checkpoint_dir():
