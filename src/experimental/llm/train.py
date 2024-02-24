@@ -1,3 +1,4 @@
+import pathlib
 from typing import Literal, Optional
 
 import pydantic_cli
@@ -84,6 +85,7 @@ def train(config: TrainLLMConfig):
     if cfg.wandb:
         if cfg.wandb_dir is None:
             cfg.wandb_dir = LOG_DIR
+        pathlib.Path(cfg.wandb_dir).mkdir(parents=True, exist_ok=True)
         logger = WandbLogger(
             project=cfg.wandb_project,
             entity=cfg.wandb_entity,
