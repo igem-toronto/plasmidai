@@ -48,6 +48,7 @@ class TrainLLMConfig(LitLLMConfig):
     wandb: bool = False
     wandb_project: str = "train_plasmid_llm"
     wandb_entity: Optional[str] = None
+    wandb_dir: Optional[str] = None
 
     checkpoint: bool = False
     checkpoint_dir: Optional[str] = None
@@ -81,11 +82,13 @@ def train(config: TrainLLMConfig):
     ]
 
     if cfg.wandb:
+        if cfg.wandb_dir is None:
+            cfg.wandb_dir = LOG_DIR
         logger = WandbLogger(
             project=cfg.wandb_project,
             entity=cfg.wandb_entity,
             log_model=False,
-            save_dir=LOG_DIR,
+            save_dir=cfg.wandb_dir,
         )
         callbacks.append(LearningRateMonitor())
     else:
