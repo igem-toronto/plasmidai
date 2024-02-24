@@ -26,7 +26,7 @@ class LitLLMConfig(pydantic.BaseModel):
     # Training Fields
     # ===============
 
-    lr: float = 8e-3
+    lr: float = 4e-3
     betas: List[float] = (0.9, 0.95)
     wd: float = 0.1
 
