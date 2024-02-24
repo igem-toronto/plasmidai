@@ -1,3 +1,4 @@
+import math
 from typing import Any, Dict, List, Literal
 
 import pydantic
@@ -25,13 +26,11 @@ class LitLLMConfig(pydantic.BaseModel):
     # Training Fields
     # ===============
 
-    lr: float = 1e-4
+    lr: float = 8e-3
     betas: List[float] = (0.9, 0.95)
     wd: float = 0.1
 
-    # ================
-    # Sampling Fields
-    # ================
+    scheduler_span: int = 50000
 
 
 class LitLLM(pl.LightningModule):
@@ -64,14 +63,27 @@ class LitLLM(pl.LightningModule):
     def generate(self, *args, **kwargs):
         return self.mamba.generate(*args, **kwargs)
 
+    def lr_schedule(self, step):
+        cfg = self.config
+        min_lr, max_lr = 1e-5, cfg.lr
+        T = cfg.scheduler_span
+        warmup = int(0.1 * T)
+
+        if step <= warmup:
+            return max_lr * (step / warmup)
+        elif warmup < step <= T:
+            scale = 1 + math.cos(math.pi * ((step - warmup) / (T - warmup)))
+            return min_lr + 0.5 * (max_lr - min_lr) * scale
+        else:
+            return min_lr
+
     def configure_optimizers(self):
         cfg = self.config
         optimizer, scheduler = build_optimizer_and_scheduler(
             self,
-            lr=cfg.lr,
+            lr=self.lr_schedule,
             betas=cfg.betas,
             wd=cfg.wd,
-            warmup=2000,
         )
 
         return {
