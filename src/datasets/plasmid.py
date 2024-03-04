@@ -26,6 +26,8 @@ class PlasmidDataset(Dataset):
         # A=0 C=1 G=2 T=3
         sequence = random_circular_crop(str(record.seq), Lmax=self.Lmax)
         sequence = dna_to_tensor(sequence)
+        if torch.rand(1) < 0.5:  # reverse-compliment
+            sequence = 3 - sequence  # A->T C->G G->C T->A
         mask = torch.full_like(sequence, True, dtype=torch.bool)
 
         # Padding & mask
