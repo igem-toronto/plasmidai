@@ -44,15 +44,14 @@ class LitLLM(pl.LightningModule):
         self.config: LitLLMConfig = LitLLMConfig.parse_obj(config)
         cfg = self.config
 
-        # A=0 C=1 G=2 T=3 EOS=4 SOS=5
+        # A=0 C=1 G=2 T=3 EOS=4
         self.eos = 4
-        self.sos = 5  # need this to be last (!)
 
         self.mamba = MambaLMHeadModel(
             config=MambaConfig(
                 d_model=cfg.hidden_features,
                 n_layer=cfg.num_layers,
-                vocab_size=(4 + 2),
+                vocab_size=(4 + 1),
                 rms_norm=(cfg.norm == "rms"),
                 residual_in_fp32=True,
                 fused_add_norm=cfg.fused_add_norm,
@@ -103,21 +102,15 @@ class LitLLM(pl.LightningModule):
     def _step(self, batch, split):
         sequences, mask = batch  # (B L) (B L)
 
-        # Convert padding into EOS tokens
         sequences = torch.where(mask, sequences, self.eos)
-
-        # Create shifted versions of the sequence
-        inputs = F.pad(sequences, (1, 0), value=self.sos)  # [sos, ...] (B L+1)
-        target = F.pad(sequences, (0, 1), value=self.eos)  # [..., eos] (B L+1)
-        mask = F.pad(mask, (1, 0), value=True)
+        sequences = F.pad(sequences, (1, 1), value=self.eos)  # [eos, ..., eos] (B L+2)
+        mask = F.pad(mask, (1, 0), value=True)  # [True] + mask
 
         # Forward pass
-        logits = self.mamba(inputs).logits  # (B L+1 6)
-        logits = logits[..., :-1]  # don't compute loss on SOS
-        logits = logits.mT  # (B 5 L+1)
+        logits = self.mamba(sequences[..., :-1]).logits.mT  # (B 5 L+1)
 
         # Compute loss
-        losses = F.cross_entropy(logits, target, reduction="none")  # (B L+1)
+        losses = F.cross_entropy(logits, sequences[..., 1:], reduction="none")  # (B L+1)
         losses = torch.where(mask, losses, 0)
         loss = losses.sum() / mask.float().sum()
 

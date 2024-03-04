@@ -115,4 +115,5 @@ def sample(config: LLMSampleConfig):
 
 
 if __name__ == "__main__":
+    raise NotImplementedError()  # FIXME: deprecated SOS
     pydantic_cli.run_and_exit(LLMSampleConfig, sample)
