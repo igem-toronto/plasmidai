@@ -38,6 +38,5 @@ def build_optimizer_and_scheduler(model, lr: Callable, betas, wd, **optim_kwargs
         **optim_kwargs,
     )
 
-    warmup_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr)
-
-    return optimizer, warmup_scheduler
+    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr)
+    return optimizer, scheduler
