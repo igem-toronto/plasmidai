@@ -47,11 +47,10 @@ class PlasmidDataModule(pl.LightningDataModule):
         self.batch_size = batch_size
         self.num_workers = num_workers
 
-        root = DATA_ROOT / "plasmids"
-        records = SeqIO.parse(root / f"plasmids.fasta", "fasta")
+        records = SeqIO.parse(DATA_ROOT / f"plasmids.fasta", "fasta")
         records = {r.id: r for r in records}
 
-        df = pd.read_csv(root / "splits.csv")
+        df = pd.read_csv(DATA_ROOT / "splits.csv")
         if finetune:
             df = df[df["finetune"]]
 
