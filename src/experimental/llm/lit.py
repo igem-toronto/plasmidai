@@ -30,7 +30,7 @@ class LitLLMConfig(pydantic.BaseModel):
     betas: List[float] = (0.9, 0.95)
     wd: float = 0.1
 
-    scheduler_span: int = 50000
+    scheduler_span: int = 100000
 
 
 class LitLLM(pl.LightningModule):
