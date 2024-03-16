@@ -30,7 +30,6 @@ class TrainLLMConfig(LitLLMConfig):
 
     batch_size: int = 32
     num_workers: int = 8
-    finetune: bool = False
 
     # ===============
     # Training Fields
@@ -40,6 +39,7 @@ class TrainLLMConfig(LitLLMConfig):
     train_steps_per_epoch: int = 50
     val_steps_per_epoch: int = 50
 
+    finetune_path: Optional[str] = None
     resume_path: Optional[str] = None
 
     # ==============
@@ -73,7 +73,7 @@ def train(config: TrainLLMConfig):
         Lmax=cfg.plasmid_length,
         batch_size=cfg.batch_size,
         num_workers=cfg.num_workers,
-        finetune=cfg.finetune,
+        finetune=(cfg.finetune_path is not None),
     )
 
     # Initialize trainer
@@ -127,7 +127,10 @@ def train(config: TrainLLMConfig):
     )
 
     # Initialize and load model
-    llm = LitLLM(config=dict(cfg))
+    if cfg.finetune_path is not None:
+        llm = LitLLM.load_from_checkpoint(cfg.finetune_path, map_location="cpu")
+    else:
+        llm = LitLLM(config=dict(cfg))
 
     # Start training
     trainer.fit(model=llm, datamodule=data, ckpt_path=cfg.resume_path)
