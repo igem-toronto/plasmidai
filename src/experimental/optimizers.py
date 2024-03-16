@@ -14,6 +14,8 @@ def build_optimizer_and_scheduler(model, lr: Callable, betas, wd, **optim_kwargs
     params_no_wd = []
 
     for name, p in model.named_parameters():
+        if not p.requires_grad:
+            continue
         *attrs, name = name.split(".")
 
         # Get parent module
