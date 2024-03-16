@@ -165,3 +165,4 @@ data/DB*
 data/tmp
 data/*.npz
 sandbox
+checkpoints
