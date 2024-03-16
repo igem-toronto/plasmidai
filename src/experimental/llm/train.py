@@ -129,6 +129,8 @@ def train(config: TrainLLMConfig):
     # Initialize and load model
     if cfg.finetune_path is not None:
         llm = LitLLM.load_from_checkpoint(cfg.finetune_path, map_location="cpu")
+        for block in llm.mamba.backbone.layers[:-2]:
+            block.requires_grad = False
     else:
         llm = LitLLM(config=dict(cfg))
 
