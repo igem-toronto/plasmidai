@@ -29,10 +29,10 @@ class LLMSampleConfig(pydantic.BaseModel):
 
     samples_path: str
 
-    num_samples: int = 1000
+    num_samples: int = 10000
     batch_size: int = 50
 
-    sample_max_length: int = 11000
+    sample_max_length: int = 10050
     sample_top_k: int = 0
     sample_top_p: float = 0.0
     sample_min_p: float = 0.0
@@ -61,8 +61,7 @@ class LLMSampler(pl.LightningModule):
             top_p=cfg.sample_top_p,
             min_p=cfg.sample_min_p,
             temperature=cfg.sample_temperature,
-            vocab_size=(4 + 1),  # exclude sos
-            eos_token_id=self.model.eos,
+            vocab_size=(4 + 1),
         )
         samples = samples[..., 1:]  # remove sos
         samples = [tensor_to_dna(x, eos=self.model.eos) for x in samples]
@@ -81,7 +80,7 @@ def sample(config: LLMSampleConfig):
 
     # Load dataset
     predict_loader = DataLoader(
-        dataset=torch.full([cfg.num_samples, 1], lit.sos, dtype=torch.long),
+        dataset=torch.full([cfg.num_samples, 1], lit.eos, dtype=torch.long),
         batch_size=cfg.batch_size,
         shuffle=False,
         drop_last=False,
