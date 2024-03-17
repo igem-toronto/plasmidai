@@ -28,8 +28,6 @@ gzip -d 240212_plasmid_seq_54646.fasta.gz
 mv 240212_plasmid_seq_54646.fasta plasmids.fasta
 cd ..
 
-wandb offline
-
 export TORCH_NCCL_BLOCKING_WAIT=1
 
 srun python -m src.experimental.llm.sample \
