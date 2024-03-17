@@ -33,7 +33,7 @@ wandb offline
 export TORCH_NCCL_BLOCKING_WAIT=1
 
 srun python -m src.experimental.llm.sample \
-    --checkpoint_path="$REPO_ROOT/checkpoints/34-00-15-03-2024/last.ckpt" \
+    --checkpoint_path="$REPO_ROOT/checkpoints/finetune-09-01-17-03-2024/last.ckpt" \
     --accelerator=gpu  \
     --precision=16-mixed \
     --batch_size=100 \
