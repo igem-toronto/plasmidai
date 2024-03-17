@@ -51,6 +51,8 @@ class LLMSampler(pl.LightningModule):
         self.config = config
         self.model = model
         self.model.eval()
+        if config.precision == "16-mixed":
+            self.model.to(torch.half)
 
     def predict_step(self, batch):
         cfg = self.config
