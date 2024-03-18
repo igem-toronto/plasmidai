@@ -4,7 +4,7 @@
 #SBATCH --tasks-per-node=4
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32GB
-#SBATCH --time=2-00:00
+#SBATCH --time=1-00:00
 #SBATCH --output=logs/%N-%j.out
 
 module load StdEnv/2023 python/3.10 scipy-stack
@@ -40,4 +40,4 @@ srun python -m src.experimental.llm.train \
     --enable_wandb --wandb_dir="$REPO_ROOT/logs" \
     --enable_checkpoint --checkpoint_dir="$REPO_ROOT/checkpoints/$(date +'%M-%H-%d-%m-%Y')" \
     --enable_progress_bar \
-    --max_epochs=250 --train_steps_per_epoch=400 --val_steps_per_epoch=200
+    --max_epochs=150 --train_steps_per_epoch=500 --val_steps_per_epoch=500 --scheduler_span=50000

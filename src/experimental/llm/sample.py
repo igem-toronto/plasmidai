@@ -1,5 +1,6 @@
 from typing import Literal
 
+import einops
 import pydantic
 import pydantic_cli
 import pytorch_lightning as pl
@@ -12,7 +13,7 @@ from Bio.SeqRecord import SeqRecord
 from torch.utils.data import DataLoader
 
 from src.experimental.llm.lit import LitLLM
-from src.utils import tensor_to_dna
+from src.utils import PlasmidTokenizer
 
 
 class LLMSampleConfig(pydantic.BaseModel):
@@ -32,11 +33,11 @@ class LLMSampleConfig(pydantic.BaseModel):
     num_samples: int = 10000
     batch_size: int = 50
 
-    sample_max_length: int = 10050
-    sample_top_k: int = 0
+    sample_max_length: int = 1500
+    sample_top_k: int = 4
     sample_top_p: float = 0.0
     sample_min_p: float = 0.0
-    sample_temperature: float = 1.0
+    sample_temperature: float = 0.7
 
     class Config(pydantic_cli.DefaultConfig):
         extra = "forbid"
@@ -54,6 +55,8 @@ class LLMSampler(pl.LightningModule):
         if config.precision == "16-mixed":
             self.model.to(torch.half)
 
+        self.tokenizer = PlasmidTokenizer()
+
     def predict_step(self, batch):
         cfg = self.config
         samples = self.model.generate(
@@ -65,8 +68,8 @@ class LLMSampler(pl.LightningModule):
             temperature=cfg.sample_temperature,
             vocab_size=(4 + 1),
         )
-        samples = samples[..., 1:]  # remove sos
-        samples = [tensor_to_dna(x, eos=self.model.eos) for x in samples]
+        samples = samples[..., batch.shape[-1]:]  # remove prompt
+        samples = [self.tokenizer.decode(x) for x in samples]
         return samples
 
 
@@ -81,8 +84,10 @@ def sample(config: LLMSampleConfig):
     model = LLMSampler(cfg, lit)
 
     # Load dataset
+    prompts = model.tokenizer.tokenize("", eos=False)
+    prompts = einops.repeat(prompts, "c -> n c", n=cfg.num_samples)
     predict_loader = DataLoader(
-        dataset=torch.full([cfg.num_samples, 1], lit.eos, dtype=torch.long),
+        dataset=prompts,
         batch_size=cfg.batch_size,
         shuffle=False,
         drop_last=False,
@@ -99,6 +104,7 @@ def sample(config: LLMSampleConfig):
         logger=False,
         enable_progress_bar=True,
         use_distributed_sampler=True,
+        log_every_n_steps=1,
     )
 
     # Sample

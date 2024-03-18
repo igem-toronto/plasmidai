@@ -4,10 +4,13 @@ from typing import Any, Dict, List, Literal
 import pydantic
 import pytorch_lightning as pl
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 from mamba_ssm.models.mixer_seq_simple import MambaConfig, MambaLMHeadModel
+from torchmetrics import MeanMetric
 
 from src.experimental.optimizers import build_optimizer_and_scheduler
+from src.utils import PlasmidTokenizer
 
 
 class LitLLMConfig(pydantic.BaseModel):
@@ -44,14 +47,12 @@ class LitLLM(pl.LightningModule):
         self.config: LitLLMConfig = LitLLMConfig.parse_obj(config)
         cfg = self.config
 
-        # A=0 C=1 G=2 T=3 EOS=4
-        self.eos = 4
-
+        self.tokenizer = PlasmidTokenizer()
         self.mamba = MambaLMHeadModel(
             config=MambaConfig(
                 d_model=cfg.hidden_features,
                 n_layer=cfg.num_layers,
-                vocab_size=(4 + 1),
+                vocab_size=self.tokenizer.vocab_size,
                 rms_norm=(cfg.norm == "rms"),
                 residual_in_fp32=True,
                 fused_add_norm=cfg.fused_add_norm,
@@ -59,12 +60,14 @@ class LitLLM(pl.LightningModule):
             )
         )
 
+        self.metrics = nn.ModuleDict({"train_": MeanMetric(), "val_": MeanMetric()})
+
     def generate(self, *args, **kwargs):
         return self.mamba.generate(*args, **kwargs)
 
     def lr_schedule(self, step):
         cfg = self.config
-        min_lr, max_lr = 1e-5, cfg.lr
+        min_lr, max_lr = 1e-4, cfg.lr
         T = cfg.scheduler_span
         warmup = int(0.1 * T)
 
@@ -100,22 +103,27 @@ class LitLLM(pl.LightningModule):
         return self._step(batch, split="val")
 
     def _step(self, batch, split):
-        sequences, mask = batch  # (B L) (B L)
-
-        sequences = torch.where(mask, sequences, self.eos)
-        sequences = F.pad(sequences, (1, 1), value=self.eos)  # [eos, ..., eos] (B L+2)
-        mask = F.pad(mask, (1, 0), value=True)  # [True] + mask
+        dnas, mask, finetune = batch
+        # (B L+1) (B L+1) (B)
 
         # Forward pass
-        logits = self.mamba(sequences[..., :-1]).logits.mT  # (B 5 L+1)
+        logits = self.mamba(dnas[..., :-1]).logits.mT  # (B C L)
+        mask = mask[..., 1:]  # (B L)
 
         # Compute loss
-        losses = F.cross_entropy(logits, sequences[..., 1:], reduction="none")  # (B L+1)
+        num_tokens = mask.int().sum()
+        losses = F.cross_entropy(logits, dnas[..., 1:], reduction="none")  # (B L)
         losses = torch.where(mask, losses, 0)
-        loss = losses.sum() / mask.float().sum()
+        loss = losses.sum() / num_tokens.float()
+
+        # Subset to finetuning plasmids
+        with torch.no_grad():
+            mask_finetune = finetune.unsqueeze(-1) & mask
+            loss_finetune = self.metrics[f"{split}_"]
+            loss_finetune.update(losses, mask_finetune.float())
 
         # Logging
-        log_kwargs = dict(batch_size=sequences.shape[0], sync_dist=(split != "train"))
-        self.log(f"{split}/loss", loss, **log_kwargs)
+        self.log(f"{split}/loss", loss, batch_size=num_tokens, sync_dist=(split != "train"))
+        self.log(f"{split}/loss_finetune", loss_finetune, on_step=False, on_epoch=True)
 
         return loss
