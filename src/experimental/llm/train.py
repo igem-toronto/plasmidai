@@ -26,8 +26,6 @@ class TrainLLMConfig(LitLLMConfig):
     # Datamodule Fields
     # =================
 
-    plasmid_length: int = 10000
-
     batch_size: int = 32
     num_workers: int = 8
 
@@ -70,7 +68,6 @@ def train(config: TrainLLMConfig):
 
     # Load dataset
     data = PlasmidDataModule(
-        Lmax=cfg.plasmid_length,
         batch_size=cfg.batch_size,
         num_workers=cfg.num_workers,
         finetune=(cfg.finetune_path is not None),

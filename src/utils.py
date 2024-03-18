@@ -18,30 +18,50 @@ LETTER_TO_BASES = {
     "Y": "CT",
 }
 
-INDEX_TO_BASE = "ACGT"
-BASE_TO_INDEX = {b: i for i, b in enumerate(INDEX_TO_BASE)}
 
+class PlasmidTokenizer:
 
-def dna_to_tensor(dna):
-    sequence = []
-    for x in dna:
-        choices = LETTER_TO_BASES[x]
-        i = torch.randint(len(choices), size=[1]).item()
-        base = choices[i]
-        sequence.append(BASE_TO_INDEX[base])
-    return torch.tensor(sequence, dtype=torch.long)
+    def __init__(self):
+        self.vocab = dict()
+        self.eos = "eos"
 
+        # Regular tokens
+        self.index_to_base = "ACGT"
+        for base in self.index_to_base:
+            self._register_token(base)
+        self._register_token(self.eos)
 
-def tensor_to_dna(sequence, eos):
-    assert sequence.ndim == 1
-    assert eos not in BASE_TO_INDEX.values()
-    dna = []
-    for idx in sequence:
-        idx = idx.item()
-        if idx == eos:
-            break
-        dna.append(INDEX_TO_BASE[idx])
-    return "".join(dna)
+    def _register_token(self, name):
+        self.vocab[name] = len(self.vocab)
+
+    @property
+    def vocab_size(self):
+        return len(self.vocab)
+
+    def tokenize(self, dna, sos=True, eos=True):
+        tokens = []
+        if sos:
+            tokens.append(self.eos)
+        for x in dna:
+            choices = LETTER_TO_BASES[x]
+            i = torch.randint(len(choices), size=[1]).item()
+            tokens.append(choices[i])
+        if eos:
+            tokens.append(self.eos)
+        sequence = [self.vocab[tok] for tok in tokens]
+        return torch.tensor(sequence, dtype=torch.long)
+
+    def decode(self, sequence):
+        assert sequence.ndim == 1
+        assert torch.all((0 <= sequence) & (sequence < self.vocab_size))
+
+        dna = []
+        for idx in sequence:
+            idx = idx.item()
+            if idx == self.vocab[self.eos]:
+                break
+            dna.append(self.index_to_base[idx])
+        return "".join(dna)
 
 
 def random_circular_crop(dna, Lmax):

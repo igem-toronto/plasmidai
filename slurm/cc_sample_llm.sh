@@ -4,7 +4,7 @@
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32GB
-#SBATCH --time=1-00:00
+#SBATCH --time=0-04:00
 #SBATCH --output=logs/%N-%j.out
 
 module load StdEnv/2023 python/3.10 scipy-stack
@@ -31,7 +31,7 @@ cd ..
 export TORCH_NCCL_BLOCKING_WAIT=1
 
 srun python -m src.experimental.llm.sample \
-    --checkpoint_path="$REPO_ROOT/checkpoints/finetune-09-01-17-03-2024/last.ckpt" \
+    --checkpoint_path="$REPO_ROOT/checkpoints/44-02-18-03-2024/last.ckpt" \
     --accelerator=gpu  \
     --precision=16-mixed \
     --batch_size=100 \

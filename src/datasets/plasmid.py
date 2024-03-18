@@ -6,7 +6,7 @@ from Bio import SeqIO
 from torch.utils.data import DataLoader, Dataset
 
 from src.paths import DATA_ROOT
-from src.utils import dna_to_tensor, random_circular_crop
+from src.utils import PlasmidTokenizer, random_circular_crop
 
 
 class PlasmidDataset(Dataset):
@@ -15,7 +15,9 @@ class PlasmidDataset(Dataset):
         super().__init__()
 
         self.records = list(records)
-        self.Lmax = Lmax
+        self.Lmax = Lmax  # max number of nt in input sequence
+
+        self.tokenizer = PlasmidTokenizer()
 
     def __len__(self):
         return len(self.records)
@@ -23,20 +25,24 @@ class PlasmidDataset(Dataset):
     def __getitem__(self, idx):
         record = self.records[idx]
 
-        # A=0 C=1 G=2 T=3
-        sequence = random_circular_crop(str(record.seq), Lmax=self.Lmax)
-        sequence = dna_to_tensor(sequence)
-        if torch.rand(1) < 0.5:  # reverse-compliment
-            sequence = 3 - sequence  # A->T C->G G->C T->A
-        mask = torch.full_like(sequence, True, dtype=torch.bool)
+        # Crop & augment
+        dna = random_circular_crop(record.seq, Lmax=self.Lmax)  # Bio.Seq object
+        dna = dna.reverse_complement()
+        dna = str(dna)
 
-        # Padding & mask
-        pad = self.Lmax - sequence.shape[0]
-        sequence = F.pad(sequence, pad=(0, pad))
+        # Tokenize
+        # [eos, nt(1), nt(2), ..., nt(Lmax-1), (eos or nt(Lmax))]
+        # depending on whether plasmid has length < Lmax
+        dna = self.tokenizer.tokenize(dna, eos=(len(dna) < self.Lmax))
+        mask = torch.full(dna.shape, True)
+
+        # Padding to Lmax + 1
+        pad = (self.Lmax + 1) - dna.shape[0]
+        dna = F.pad(dna, pad=(0, pad))
         mask = F.pad(mask, pad=(0, pad), value=False)
 
         # Done!
-        return sequence, mask
+        return dna, mask, record.finetune
 
 
 class PlasmidDataModule(pl.LightningDataModule):
@@ -51,6 +57,8 @@ class PlasmidDataModule(pl.LightningDataModule):
         records = {r.id: r for r in records}
 
         df = pd.read_csv(DATA_ROOT / "splits.csv")
+        for _, row in df.iterrows():
+            records[row["id"]].finetune = row["finetune"]
         if finetune:
             df = df[df["finetune"]]
 
