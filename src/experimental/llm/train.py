@@ -99,7 +99,9 @@ def train(config: TrainLLMConfig):
         callbacks.append(
             ModelCheckpoint(
                 dirpath=cfg.checkpoint_dir,
-                monitor="val/loss",
+                filename="epoch={epoch}-loss={val/loss_finetune:.3f}",
+                auto_insert_metric_name=False,
+                monitor="val/loss_finetune",
                 mode="min",
                 save_top_k=3,
                 save_last=True,
