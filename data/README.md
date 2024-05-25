@@ -30,7 +30,7 @@ Cluster the filtered plasmids with MMseqs2:
 
 ```bash
 mmseqs createdb plasmids.short.fasta DB
-mmseqs cluster DB DB_clu tmp --min-seq-id 0.8 --wrapped-scoring 1 --cov-mode 3 --cluster-reassign
+mmseqs cluster DB DB_clu tmp --min-seq-id 0.9 --wrapped-scoring 1 --cov-mode 3 --cluster-reassign
 mmseqs createtsv DB DB DB_clu DB_clu.tsv 
 ```
 
