@@ -27,7 +27,8 @@ class PlasmidDataset(Dataset):
 
         # Crop & augment
         dna = random_circular_crop(record.seq, Lmax=self.Lmax)  # Bio.Seq object
-        dna = dna.reverse_complement()
+        if torch.rand(1) < 0.5:
+            dna = dna.reverse_complement()
         dna = str(dna)
 
         # Tokenize
