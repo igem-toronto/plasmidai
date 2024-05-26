@@ -3,6 +3,7 @@ from typing import Literal, Optional
 
 import pydantic_cli
 import pytorch_lightning as pl
+import torch
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint, ModelSummary
 from pytorch_lightning.loggers import WandbLogger
 
@@ -20,6 +21,7 @@ class TrainLLMConfig(LitLLMConfig):
     devices: int = 1
     strategy: Optional[str] = "auto"
 
+    matmul_precision: Literal["medium", "high", "highest"] = "highest"
     precision: Literal["32", "16-mixed", "bf16-mixed"] = "32"
 
     # =================
@@ -62,6 +64,13 @@ class TrainLLMConfig(LitLLMConfig):
 
 def train(config: TrainLLMConfig):
     cfg = config
+
+    # Torch settings
+    if cfg.accelerator == "gpu":
+        torch.backends.cudnn.benchmark = True
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
+    torch.set_float32_matmul_precision(cfg.matmul_precision)
 
     # Seeding
     pl.seed_everything(cfg.seed, workers=True)
