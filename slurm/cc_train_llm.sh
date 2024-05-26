@@ -21,7 +21,7 @@ wandb offline
 export TORCH_NCCL_BLOCKING_WAIT=1
 
 srun python -m src.experimental.llm.train \
-    --accelerator=gpu --devices=4 \
+    --accelerator=gpu --devices=2 \
     --precision=bf16-mixed \
     --batch_size=45 --num_workers=4 \
     --enable_fused_add_norm \
