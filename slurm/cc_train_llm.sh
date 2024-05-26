@@ -10,7 +10,7 @@
 module load StdEnv/2023 python/3.10 scipy-stack
 virtualenv --no-download $SLURM_TMPDIR/env
 source $SLURM_TMPDIR/env/bin/activate
-pip install --no-index "torch<2.3" pytorch_lightning wandb "pydantic<2" einops scipy pandas biopython mamba_ssm
+pip install --no-index "torch<2.3" pytorch_lightning wandb "pydantic<2" einops scipy pandas biopython mamba_ssm causal_conv1d
 pip install $HOME/wheels/pydantic_cli-4.3.0-py3-none-any.whl
 
 export REPO_ROOT=~/code/plasmid-ai
