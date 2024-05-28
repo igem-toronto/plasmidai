@@ -4,7 +4,7 @@
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32GB
-#SBATCH --time=0-05:00
+#SBATCH --time=0-02:00
 #SBATCH --output=logs/%N-%j.out
 
 module load StdEnv/2023 python/3.10 scipy-stack
