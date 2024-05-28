@@ -4,6 +4,7 @@ from typing import Literal, Optional
 import pydantic_cli
 import pytorch_lightning as pl
 import torch
+import torch.nn as nn
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint, ModelSummary
 from pytorch_lightning.loggers import WandbLogger
 
@@ -142,8 +143,8 @@ def train(config: TrainLLMConfig):
             config=dict(cfg),
         )
         llm.requires_grad_(False)
-        for block in llm.mamba.backbone.layers[-2:]:
-            block.requires_grad_(True)
+        head = llm.mamba.lm_head
+        head.weight = nn.Parameter(head.weight.data)
     else:
         llm = LitLLM(config=dict(cfg))
 
