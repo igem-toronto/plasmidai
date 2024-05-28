@@ -143,6 +143,8 @@ def train(config: TrainLLMConfig):
             config=dict(cfg),
         )
         llm.requires_grad_(False)
+        llm.mamba.backbone.layers[-1].requires_grad_(True)
+        llm.mamba.backbone.norm_f.requires_grad_(True)
         head = llm.mamba.lm_head
         head.weight = nn.Parameter(head.weight.data)
     else:
