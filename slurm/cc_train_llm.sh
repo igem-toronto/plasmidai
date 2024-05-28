@@ -25,7 +25,7 @@ srun python -m src.experimental.llm.train \
     --precision=bf16-mixed \
     --batch_size=45 --num_workers=4 \
     --enable_fused_add_norm \
-    --enable_wandb --wandb_dir="$REPO_ROOT/logs" \
-    --enable_checkpoint --checkpoint_dir="$REPO_ROOT/checkpoints/$(date +'%M-%H-%d-%m-%Y')" \
+    --enable_wandb --wandb_dir="{$REPO_ROOT}/logs" \
+    --enable_checkpoint --checkpoint_dir="{$REPO_ROOT}/checkpoints/$(date +'%M-%H-%d-%m-%Y')" \
     --enable_progress_bar \
     --max_epochs=125 --train_steps_per_epoch=500 --val_steps_per_epoch=500 --scheduler_span=50000
