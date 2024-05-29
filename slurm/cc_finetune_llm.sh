@@ -28,5 +28,5 @@ srun python -m src.experimental.llm.train \
     --enable_wandb --wandb_dir="${REPO_ROOT}/logs" \
     --enable_checkpoint --checkpoint_dir="${REPO_ROOT}/checkpoints/finetune-$(date +'%M-%H-%d-%m-%Y')" \
     --enable_progress_bar \
-    --max_epochs=500 --train_steps_per_epoch=1000000 --val_steps_per_epoch=1000000 --scheduler_span=0 \
+    --max_epochs=500 --train_steps_per_epoch=1000000 --val_steps_per_epoch=1000000 --scheduler_span=1 \
     --finetune_path="${REPO_ROOT}/checkpoints/30-17-26-05-2024/last.ckpt"
