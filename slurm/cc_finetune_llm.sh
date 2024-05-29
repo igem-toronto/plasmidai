@@ -4,7 +4,7 @@
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32GB
-#SBATCH --time=0-02:00
+#SBATCH --time=0-08:00
 #SBATCH --output=logs/%N-%j.out
 
 module load StdEnv/2023 python/3.10 scipy-stack
@@ -28,5 +28,5 @@ srun python -m src.experimental.llm.train \
     --enable_wandb --wandb_dir="${REPO_ROOT}/logs" \
     --enable_checkpoint --checkpoint_dir="${REPO_ROOT}/checkpoints/finetune-$(date +'%M-%H-%d-%m-%Y')" \
     --enable_progress_bar \
-    --max_epochs=150 --train_steps_per_epoch=1000000 --val_steps_per_epoch=1000000 --scheduler_span=5000 \
+    --max_epochs=500 --train_steps_per_epoch=1000000 --val_steps_per_epoch=1000000 --scheduler_span=0 \
     --finetune_path="${REPO_ROOT}/checkpoints/30-17-26-05-2024/last.ckpt"
