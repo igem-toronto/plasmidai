@@ -4,7 +4,7 @@
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32GB
-#SBATCH --time=0-08:00
+#SBATCH --time=1-00:00
 #SBATCH --output=logs/%N-%j.out
 
 module load StdEnv/2023 python/3.10 scipy-stack
@@ -22,12 +22,12 @@ export TORCH_NCCL_BLOCKING_WAIT=1
 
 srun python -m src.experimental.llm.train \
     --accelerator=gpu --devices=1 \
-    --precision=bf16-mixed \
+    --precision=bf16-mixed --matmul_precision=medium \
     --batch_size=45 --num_workers=4 \
     --enable_fused_add_norm \
     --enable_wandb --wandb_dir="${REPO_ROOT}/logs" \
     --enable_checkpoint --checkpoint_dir="${REPO_ROOT}/checkpoints/finetune-$(date +'%M-%H-%d-%m-%Y')" \
     --enable_progress_bar \
-    --max_epochs=500 --train_steps_per_epoch=1000000 --val_steps_per_epoch=1000000 \
+    --max_epochs=100000 --train_steps_per_epoch=1000000 --val_steps_per_epoch=1000000 \
     --scheduler_shape=flat --lr=0.0001 \
     --finetune_path="${REPO_ROOT}/checkpoints/30-17-26-05-2024/last.ckpt"
