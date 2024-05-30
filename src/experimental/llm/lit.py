@@ -33,6 +33,7 @@ class LitLLMConfig(pydantic.BaseModel):
     betas: List[float] = (0.9, 0.95)
     wd: float = 0.1
 
+    scheduler_shape: Literal["hump", "flat"] = "hump"
     scheduler_span: int = 100000
 
 
@@ -71,7 +72,9 @@ class LitLLM(pl.LightningModule):
         T = cfg.scheduler_span
         warmup = int(0.1 * T)
 
-        if step <= warmup:
+        if cfg.scheduler_span == "flat":
+            return cfg.lr
+        elif step <= warmup:
             return max_lr * (step / warmup)
         elif warmup < step <= T:
             scale = 1 + math.cos(math.pi * ((step - warmup) / (T - warmup)))
