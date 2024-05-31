@@ -16,6 +16,7 @@ from src.utils import PlasmidTokenizer
 
 
 class LLMSampleConfig(pydantic.BaseModel):
+
     seed: int = 100
     checkpoint_path: str
 
