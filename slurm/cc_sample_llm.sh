@@ -22,7 +22,7 @@ export TORCH_NCCL_BLOCKING_WAIT=1
 
 srun python -m src.experimental.llm.sample \
     --checkpoint_path="${REPO_ROOT}/checkpoints/finetune-26-22-29-05-2024/last.ckpt" \
-    --accelerator=gpu  \
+    --accelerator=gpu --matmul_precision=medium \
     --precision=bf16-mixed \
-    --batch_size=100 \
+    --batch_size=100 --num_samples=10000 \
     --samples_path="${REPO_ROOT}/samples/samples-$(date +'%M-%H-%d-%m-%Y').fasta"

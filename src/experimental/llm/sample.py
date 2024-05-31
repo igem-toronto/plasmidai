@@ -4,6 +4,7 @@ import einops
 import pydantic
 import pydantic_cli
 import pytorch_lightning as pl
+import torch
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -14,11 +15,11 @@ from src.utils import PlasmidTokenizer
 
 
 class LLMSampleConfig(pydantic.BaseModel):
-
     seed: int = 100
     checkpoint_path: str
 
     accelerator: Literal["cpu", "gpu"] = "cpu"
+    matmul_precision: Literal["medium", "high", "highest"] = "highest"
     precision: Literal["32", "16-mixed", "bf16-mixed"] = "32"
 
     # =============
@@ -76,6 +77,9 @@ class LLMSampler(pl.LightningModule):
 
 def sample(config: LLMSampleConfig):
     cfg = config
+
+    # Torch settings
+    torch.set_float32_matmul_precision(cfg.matmul_precision)
 
     # Seeding
     pl.seed_everything(cfg.seed, workers=True)
