@@ -4,9 +4,6 @@ import einops
 import pydantic
 import pydantic_cli
 import pytorch_lightning as pl
-import torch
-import torch.backends.cuda
-import torch.backends.cudnn
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -52,10 +49,14 @@ class LLMSampler(pl.LightningModule):
         self.config = config
         self.model = model
         self.model.eval()
-        if config.precision == "16-mixed":
-            self.model.to(torch.half)
-
         self.tokenizer = PlasmidTokenizer()
+
+        if config.precision.startswith("16"):
+            self.model.half()
+        elif config.precision.startswith("bf16"):
+            self.model.bfloat16()
+        else:
+            self.model.float()
 
     def predict_step(self, batch):
         cfg = self.config
