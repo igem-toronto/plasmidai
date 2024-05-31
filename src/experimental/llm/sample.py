@@ -33,7 +33,7 @@ class LLMSampleConfig(pydantic.BaseModel):
     num_samples: int = 10000
     batch_size: int = 50
 
-    sample_max_length: int = 1500
+    sample_max_length: int = 10000
     sample_top_k: int = 4
     sample_top_p: float = 0.0
     sample_min_p: float = 0.0
