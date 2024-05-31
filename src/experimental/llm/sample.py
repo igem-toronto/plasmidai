@@ -1,3 +1,4 @@
+import pathlib
 from typing import Literal
 
 import einops
@@ -117,11 +118,14 @@ def sample(config: LLMSampleConfig):
     samples = sum(samples, [])  # flatten
 
     # Write to fasta
-    records = []
-    for i, plasmid in enumerate(samples):
-        r = SeqRecord(seq=Seq(plasmid), id=f"sample_{i}", description="")
-        records.append(r)
-    SeqIO.write(records, cfg.samples_path, "fasta")
+    samples_path = pathlib.Path(cfg.samples_path)
+    samples_path.parent.mkdir(parents=True, exist_ok=True)
+
+    records = [
+        SeqRecord(seq=Seq(plasmid), id=f"sample_{i}", description="")
+        for i, plasmid in enumerate(samples)
+    ]
+    SeqIO.write(records, samples_path, "fasta")
 
     return 0
 
