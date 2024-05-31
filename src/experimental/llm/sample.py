@@ -38,6 +38,7 @@ class LLMSampleConfig(pydantic.BaseModel):
     sample_top_p: float = 0.0
     sample_min_p: float = 0.0
     sample_temperature: float = 0.7
+    repetition_penalty: float = 1.0
 
     class Config(pydantic_cli.DefaultConfig):
         extra = "forbid"
@@ -70,6 +71,7 @@ class LLMSampler(pl.LightningModule):
             top_p=cfg.sample_top_p,
             min_p=cfg.sample_min_p,
             temperature=cfg.sample_temperature,
+            repetition_penalty=cfg.repetition_penalty,
             vocab_size=(4 + 1),
         )
         samples = samples[..., batch.shape[-1]:]  # remove prompt
