@@ -1,4 +1,4 @@
-import functools
+from typing import Callable
 
 import torch
 import torch.nn as nn
@@ -9,15 +9,13 @@ except ImportError:
     RMSNorm = None
 
 
-def linear_warmup(step, warmup):
-    return min(step, warmup) / warmup
-
-
-def build_optimizer_and_scheduler(model, lr, betas, wd, warmup, **optim_kwargs):
+def build_optimizer_and_scheduler(model, lr: Callable, betas, wd, **optim_kwargs):
     params = []
     params_no_wd = []
 
     for name, p in model.named_parameters():
+        if not p.requires_grad:
+            continue
         *attrs, name = name.split(".")
 
         # Get parent module
@@ -38,11 +36,9 @@ def build_optimizer_and_scheduler(model, lr, betas, wd, warmup, **optim_kwargs):
             {"params": params, "weight_decay": wd},
             {"params": params_no_wd, "weight_decay": 0.0},
         ],
-        lr=lr, betas=betas,
+        lr=1.0, betas=betas,
         **optim_kwargs,
     )
 
-    warmup_fn = functools.partial(linear_warmup, warmup=warmup)
-    warmup_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=warmup_fn)
-
-    return optimizer, warmup_scheduler
+    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr)
+    return optimizer, scheduler

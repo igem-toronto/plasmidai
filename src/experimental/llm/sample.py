@@ -1,18 +1,18 @@
+import pathlib
 from typing import Literal
 
-import lightning.pytorch as pl
+import einops
 import pydantic
 import pydantic_cli
+import pytorch_lightning as pl
 import torch
-import torch.backends.cuda
-import torch.backends.cudnn
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from torch.utils.data import DataLoader
 
 from src.experimental.llm.lit import LitLLM
-from src.utils import tensor_to_dna
+from src.utils import PlasmidTokenizer
 
 
 class LLMSampleConfig(pydantic.BaseModel):
@@ -21,6 +21,7 @@ class LLMSampleConfig(pydantic.BaseModel):
     checkpoint_path: str
 
     accelerator: Literal["cpu", "gpu"] = "cpu"
+    matmul_precision: Literal["medium", "high", "highest"] = "highest"
     precision: Literal["32", "16-mixed", "bf16-mixed"] = "32"
 
     # =============
@@ -29,14 +30,15 @@ class LLMSampleConfig(pydantic.BaseModel):
 
     samples_path: str
 
-    num_samples: int = 1000
+    num_samples: int = 10000
     batch_size: int = 50
 
-    sample_max_length: int = 11000
-    sample_top_k: int = 0
+    sample_max_length: int = 10000
+    sample_top_k: int = 4
     sample_top_p: float = 0.0
     sample_min_p: float = 0.0
-    sample_temperature: float = 1.0
+    sample_temperature: float = 0.7
+    repetition_penalty: float = 1.0
 
     class Config(pydantic_cli.DefaultConfig):
         extra = "forbid"
@@ -51,6 +53,14 @@ class LLMSampler(pl.LightningModule):
         self.config = config
         self.model = model
         self.model.eval()
+        self.tokenizer = PlasmidTokenizer()
+
+        if config.precision.startswith("16"):
+            self.model.half()
+        elif config.precision.startswith("bf16"):
+            self.model.bfloat16()
+        else:
+            self.model.float()
 
     def predict_step(self, batch):
         cfg = self.config
@@ -61,11 +71,11 @@ class LLMSampler(pl.LightningModule):
             top_p=cfg.sample_top_p,
             min_p=cfg.sample_min_p,
             temperature=cfg.sample_temperature,
-            vocab_size=(4 + 1),  # exclude sos
-            eos_token_id=self.model.eos,
+            repetition_penalty=cfg.repetition_penalty,
+            vocab_size=(4 + 1),
         )
-        samples = samples[..., 1:]  # remove sos
-        samples = [tensor_to_dna(x, eos=self.model.eos) for x in samples]
+        samples = samples[..., batch.shape[-1]:]  # remove prompt
+        samples = [self.tokenizer.decode(x) for x in samples]
         return samples
 
 
@@ -73,9 +83,7 @@ def sample(config: LLMSampleConfig):
     cfg = config
 
     # Torch settings
-    if cfg.accelerator == "gpu":
-        torch.backends.cuda.matmul.allow_tf32 = True
-        torch.backends.cudnn.allow_tf32 = True
+    torch.set_float32_matmul_precision(cfg.matmul_precision)
 
     # Seeding
     pl.seed_everything(cfg.seed, workers=True)
@@ -85,8 +93,10 @@ def sample(config: LLMSampleConfig):
     model = LLMSampler(cfg, lit)
 
     # Load dataset
+    prompts = model.tokenizer.tokenize("", eos=False)
+    prompts = einops.repeat(prompts, "c -> n c", n=cfg.num_samples)
     predict_loader = DataLoader(
-        dataset=torch.full([cfg.num_samples, 1], lit.sos, dtype=torch.long),
+        dataset=prompts,
         batch_size=cfg.batch_size,
         shuffle=False,
         drop_last=False,
@@ -103,6 +113,7 @@ def sample(config: LLMSampleConfig):
         logger=False,
         enable_progress_bar=True,
         use_distributed_sampler=True,
+        log_every_n_steps=1,
     )
 
     # Sample
@@ -110,11 +121,14 @@ def sample(config: LLMSampleConfig):
     samples = sum(samples, [])  # flatten
 
     # Write to fasta
-    records = []
-    for i, plasmid in enumerate(samples):
-        r = SeqRecord(seq=Seq(plasmid), id=f"sample_{i}", description="")
-        records.append(r)
-    SeqIO.write(records, cfg.samples_path, "fasta")
+    samples_path = pathlib.Path(cfg.samples_path)
+    samples_path.parent.mkdir(parents=True, exist_ok=True)
+
+    records = [
+        SeqRecord(seq=Seq(plasmid), id=f"sample_{i}", description="")
+        for i, plasmid in enumerate(samples)
+    ]
+    SeqIO.write(records, samples_path, "fasta")
 
     return 0
 
