@@ -1,9 +1,12 @@
-from typing import List, Literal, Optional
+import pathlib
+from typing import Literal, Optional
 
-import lightning.pytorch as pl
 import pydantic_cli
-from lightning.pytorch.callbacks import LearningRateMonitor, ModelCheckpoint, ModelSummary
-from lightning.pytorch.loggers import WandbLogger
+import pytorch_lightning as pl
+import torch
+import torch.nn as nn
+from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint, ModelSummary
+from pytorch_lightning.loggers import WandbLogger
 
 from src.datasets import PlasmidDataModule
 from src.experimental.callbacks import GradNormCallback
@@ -19,26 +22,25 @@ class TrainLLMConfig(LitLLMConfig):
     devices: int = 1
     strategy: Optional[str] = "auto"
 
+    matmul_precision: Literal["medium", "high", "highest"] = "highest"
     precision: Literal["32", "16-mixed", "bf16-mixed"] = "32"
 
     # =================
     # Datamodule Fields
     # =================
 
-    plasmid_length: int = 10000
-
     batch_size: int = 32
     num_workers: int = 8
-    finetune: bool = False
 
     # ===============
     # Training Fields
     # ===============
 
-    max_epochs: int = 1500
+    max_epochs: int = -1
     train_steps_per_epoch: int = 50
     val_steps_per_epoch: int = 50
 
+    finetune_path: Optional[str] = None
     resume_path: Optional[str] = None
 
     # ==============
@@ -48,6 +50,7 @@ class TrainLLMConfig(LitLLMConfig):
     wandb: bool = False
     wandb_project: str = "train_plasmid_llm"
     wandb_entity: Optional[str] = None
+    wandb_dir: Optional[str] = None
 
     checkpoint: bool = False
     checkpoint_dir: Optional[str] = None
@@ -63,15 +66,21 @@ class TrainLLMConfig(LitLLMConfig):
 def train(config: TrainLLMConfig):
     cfg = config
 
+    # Torch settings
+    if cfg.accelerator == "gpu":
+        torch.backends.cudnn.benchmark = True
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
+    torch.set_float32_matmul_precision(cfg.matmul_precision)
+
     # Seeding
     pl.seed_everything(cfg.seed, workers=True)
 
     # Load dataset
     data = PlasmidDataModule(
-        Lmax=cfg.plasmid_length,
         batch_size=cfg.batch_size,
         num_workers=cfg.num_workers,
-        finetune=cfg.finetune,
+        finetune=(cfg.finetune_path is not None),
     )
 
     # Initialize trainer
@@ -81,11 +90,14 @@ def train(config: TrainLLMConfig):
     ]
 
     if cfg.wandb:
+        if cfg.wandb_dir is None:
+            cfg.wandb_dir = LOG_DIR
+        pathlib.Path(cfg.wandb_dir).mkdir(parents=True, exist_ok=True)
         logger = WandbLogger(
             project=cfg.wandb_project,
             entity=cfg.wandb_entity,
             log_model=False,
-            save_dir=LOG_DIR,
+            save_dir=cfg.wandb_dir,
         )
         callbacks.append(LearningRateMonitor())
     else:
@@ -97,7 +109,9 @@ def train(config: TrainLLMConfig):
         callbacks.append(
             ModelCheckpoint(
                 dirpath=cfg.checkpoint_dir,
-                monitor="val/loss",
+                filename="epoch={epoch}-loss={val/loss_finetune:.3f}",
+                auto_insert_metric_name=False,
+                monitor="val/loss_finetune",
                 mode="min",
                 save_top_k=3,
                 save_last=True,
@@ -122,7 +136,19 @@ def train(config: TrainLLMConfig):
     )
 
     # Initialize and load model
-    llm = LitLLM(config=dict(cfg))
+    if cfg.finetune_path is not None:
+        llm = LitLLM.load_from_checkpoint(
+            cfg.finetune_path,
+            map_location="cpu",
+            config=dict(cfg),
+        )
+        llm.requires_grad_(False)
+        llm.mamba.backbone.layers[-1].requires_grad_(True)
+        llm.mamba.backbone.norm_f.requires_grad_(True)
+        head = llm.mamba.lm_head
+        head.weight = nn.Parameter(head.weight.data)
+    else:
+        llm = LitLLM(config=dict(cfg))
 
     # Start training
     trainer.fit(model=llm, datamodule=data, ckpt_path=cfg.resume_path)
