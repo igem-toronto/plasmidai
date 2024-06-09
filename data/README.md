@@ -8,6 +8,12 @@ Download the full-length plasmid dataset:
 gdown "1iIsat00ST5vK-06BUstuTbJkfWKpV2lE" 
 ```
 
+or
+
+```bash
+wget https://drive.google.com/file/d/1iIsat00ST5vK-06BUstuTbJkfWKpV2lE
+```
+
 Unzip and rename it:
 
 ```bash 
