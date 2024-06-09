@@ -49,10 +49,40 @@
       "special": true
     }
   ],
-  "normalizer": null,
-  "pre_tokenizer": {
-    "type": "Whitespace"
+  "normalizer": {
+    "type": "Sequence",
+    "normalizers": [
+      {
+        "type": "Replace",
+        "pattern": {
+          "String": " "
+        },
+        "content": ""
+      },
+      {
+        "type": "Replace",
+        "pattern": {
+          "String": "\n"
+        },
+        "content": ""
+      },
+      {
+        "type": "Replace",
+        "pattern": {
+          "String": "\r"
+        },
+        "content": ""
+      },
+      {
+        "type": "Replace",
+        "pattern": {
+          "String": "\t"
+        },
+        "content": ""
+      }
+    ]
   },
+  "pre_tokenizer": null,
   "post_processor": {
     "type": "TemplateProcessing",
     "single": [
@@ -117,6 +147,24 @@
           "[CLS]"
         ]
       },
+      "[MASK]": {
+        "id": "[MASK]",
+        "ids": [
+          4
+        ],
+        "tokens": [
+          "[MASK]"
+        ]
+      },
+      "[PAD]": {
+        "id": "[PAD]",
+        "ids": [
+          2
+        ],
+        "tokens": [
+          "[PAD]"
+        ]
+      },
       "[SEP]": {
         "id": "[SEP]",
         "ids": [
@@ -124,6 +172,15 @@
         ],
         "tokens": [
           "[SEP]"
+        ]
+      },
+      "[UNK]": {
+        "id": "[UNK]",
+        "ids": [
+          0
+        ],
+        "tokens": [
+          "[UNK]"
         ]
       }
     }
