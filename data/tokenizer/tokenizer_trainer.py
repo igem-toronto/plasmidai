@@ -34,12 +34,12 @@ LETTER_TO_BASES = {
     "Y": "CT",
 }
 
-ROOT = '/scratch/adibvafa/plasmid-ai/'
+ROOT = 'E:\\PlasmidAI'
 DATA_ROOT = f'{ROOT}/data'
 DATASET = f'{DATA_ROOT}/plasmids.fasta'
 DATASET_TXT = f'{DATA_ROOT}/plasmids.txt'
 DATASET_DUMMY =f'{DATA_ROOT}/plasmids_dummy.txt'
-TOKENIZER = 'dna_bpe_tokenizer'
+TOKENIZER = f'{DATA_ROOT}/tokenizer/dna_bpe_tokenizer_complete.json'
 
 SEED = 42
 VOCAB_SIZE = 4096
@@ -51,7 +51,7 @@ SPECIAL_TOKENS = ['[UNK]', '[SEP]', '[PAD]', '[CLS]', '[MASK]']
 if __name__ == '__main__':
     random.seed(SEED)
     os.environ["TOKENIZERS_PARALLELISM"] = "1"
-    print('Tokenizer training started...\n')
+    print('\nTokenizer training started...\n')
 
     # Train the SentencePiece model with HuggingFace
     tokenizer = Tokenizer(
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     )
 
     # Train tokenizer
-    tokenizer.train([DATASET_DUMMY], trainer)
+    tokenizer.train([DATASET_TXT], trainer)
 
     # Set post-processor with correct special token references
     tokenizer.post_processor = TemplateProcessing(
@@ -97,4 +97,4 @@ if __name__ == '__main__':
         ]
     )
 
-    tokenizer.save(f"{TOKENIZER}.json")
+    tokenizer.save(TOKENIZER)
