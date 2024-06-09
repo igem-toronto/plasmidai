@@ -51,6 +51,7 @@ SPECIAL_TOKENS = ['[UNK]', '[SEP]', '[PAD]', '[CLS]', '[MASK]']
 if __name__ == '__main__':
     random.seed(SEED)
     os.environ["TOKENIZERS_PARALLELISM"] = "1"
+    print('Tokenizer training started...\n')
 
     # Train the SentencePiece model with HuggingFace
     tokenizer = Tokenizer(
