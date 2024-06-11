@@ -27,12 +27,13 @@ LETTER_TO_BASES = {
     "Y": "CT",
 }
 
-ROOT = '/scratch/adibvafa/plasmid-ai/'
+ROOT = 'e:/PlasmidAI' # '/scratch/adibvafa/plasmid-ai/'
 DATA_ROOT = f'{ROOT}/data'
 DATASET = f'{DATA_ROOT}/plasmids.fasta'
 DATASET_TXT = f'{DATA_ROOT}/plasmids.txt'
 DATASET_DUMMY =f'{DATA_ROOT}/plasmids_dummy.txt'
 DATASET_FINETUNE = f'{DATA_ROOT}/plasmids_finetune.txt'
+DATASET_CUTOFF = f'{DATA_ROOT}/plasmids_cutoff.txt'
 TOKENIZER = f'{DATA_ROOT}/tokenizer/dna_bpe_tokenizer_finetune.json'
 
 SEED = 42
@@ -75,7 +76,7 @@ if __name__ == '__main__':
     )
 
     # Train tokenizer
-    tokenizer.train([DATASET_FINETUNE], trainer)
+    tokenizer.train([DATASET_CUTOFF], trainer)
 
     # Set post-processor with correct special token references
     tokenizer.post_processor = TemplateProcessing(
