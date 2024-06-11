@@ -1,12 +1,5 @@
 import os
 import random
-import pandas as pd
-import matplotlib.pyplot as plt
-
-from tqdm import tqdm
-from Bio import SeqIO
-
-from transformers import PreTrainedTokenizerFast
 
 from tokenizers import Tokenizer, normalizers, pre_tokenizers
 from tokenizers.models import BPE
@@ -39,11 +32,11 @@ DATA_ROOT = f'{ROOT}/data'
 DATASET = f'{DATA_ROOT}/plasmids.fasta'
 DATASET_TXT = f'{DATA_ROOT}/plasmids.txt'
 DATASET_DUMMY =f'{DATA_ROOT}/plasmids_dummy.txt'
-TOKENIZER = f'{DATA_ROOT}/tokenizer/dna_bpe_tokenizer_complete.json'
+DATASET_FINETUNE = f'{DATA_ROOT}/plasmids_finetune.txt'
+TOKENIZER = f'{DATA_ROOT}/tokenizer/dna_bpe_tokenizer_finetune.json'
 
 SEED = 42
 VOCAB_SIZE = 4096
-NUM_SEQUENCES = 10     #54646
 MAX_TOKEN_LENGTH = 32
 SPECIAL_TOKENS = ['[UNK]', '[SEP]', '[PAD]', '[CLS]', '[MASK]']
 
@@ -82,7 +75,7 @@ if __name__ == '__main__':
     )
 
     # Train tokenizer
-    tokenizer.train([DATASET_TXT], trainer)
+    tokenizer.train([DATASET_FINETUNE], trainer)
 
     # Set post-processor with correct special token references
     tokenizer.post_processor = TemplateProcessing(
