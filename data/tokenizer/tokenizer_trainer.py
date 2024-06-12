@@ -27,7 +27,7 @@ LETTER_TO_BASES = {
     "Y": "CT",
 }
 
-ROOT = 'e:/PlasmidAI' # '/scratch/adibvafa/plasmid-ai/'
+ROOT = '/scratch/adibvafa/plasmid-ai/'
 DATA_ROOT = f'{ROOT}/data'
 DATASET = f'{DATA_ROOT}/plasmids.fasta'
 DATASET_TXT = f'{DATA_ROOT}/plasmids.txt'
