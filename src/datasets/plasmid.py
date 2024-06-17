@@ -1,12 +1,11 @@
 import pandas as pd
 import pytorch_lightning as pl
 import torch
-import torch.nn.functional as F
 from Bio import SeqIO
 from torch.utils.data import DataLoader, Dataset
 
 from src.paths import DATA_ROOT
-from src.utils import PlasmidTokenizer, random_circular_crop
+from src.utils import TOKENIZER, random_circular_crop
 
 
 class PlasmidDataset(Dataset):
@@ -16,8 +15,6 @@ class PlasmidDataset(Dataset):
 
         self.records = list(records)
         self.Lmax = Lmax  # max number of nt in input sequence
-
-        self.tokenizer = PlasmidTokenizer()
 
     def __len__(self):
         return len(self.records)
@@ -32,15 +29,11 @@ class PlasmidDataset(Dataset):
         dna = str(dna)
 
         # Tokenize
-        # [eos, nt(1), nt(2), ..., nt(Lmax-1), (eos or nt(Lmax))]
-        # depending on whether plasmid has length < Lmax
-        dna = self.tokenizer.tokenize(dna, eos=(len(dna) < self.Lmax))
-        mask = torch.full(dna.shape, True)
+        dna = TOKENIZER.tokenize(dna, max_length=self.Lmax)["input_ids"][0]
 
-        # Padding to Lmax + 1
-        pad = (self.Lmax + 1) - dna.shape[0]
-        dna = F.pad(dna, pad=(0, pad))
-        mask = F.pad(mask, pad=(0, pad), value=False)
+        # Mask
+        pad_idx = TOKENIZER.vocab[TOKENIZER.pad_token]
+        mask = (dna != pad_idx)
 
         # Done!
         return dna, mask, record.finetune
@@ -48,7 +41,7 @@ class PlasmidDataset(Dataset):
 
 class PlasmidDataModule(pl.LightningDataModule):
 
-    def __init__(self, Lmax=10000, batch_size=10, num_workers=0, finetune=False):
+    def __init__(self, Lmax=2100, batch_size=10, num_workers=0, finetune=False):
         super().__init__()
 
         self.batch_size = batch_size
@@ -66,7 +59,7 @@ class PlasmidDataModule(pl.LightningDataModule):
         self.datasets = {}
         for split, group in df.groupby("split"):
             examples = [records[k] for k in group["id"]]
-            self.datasets[split] = PlasmidDataset(examples, Lmax=Lmax)
+            self.datasets[split] = PlasmidDataset(examples, tokenizer, Lmax=Lmax)
 
     def train_dataloader(self):
         return self._loader(split="train")

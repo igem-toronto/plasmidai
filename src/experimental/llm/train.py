@@ -29,7 +29,7 @@ class TrainLLMConfig(LitLLMConfig):
     # Datamodule Fields
     # =================
 
-    batch_size: int = 32
+    batch_size: int = 64
     num_workers: int = 8
 
     # ===============
