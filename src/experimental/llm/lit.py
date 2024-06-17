@@ -10,7 +10,7 @@ from mamba_ssm.models.mixer_seq_simple import MambaConfig, MambaLMHeadModel
 from torchmetrics import MeanMetric
 
 from src.experimental.optimizers import build_optimizer_and_scheduler
-from src.utils import PlasmidTokenizer
+from src.utils import TOKENIZER
 
 
 class LitLLMConfig(pydantic.BaseModel):
@@ -19,7 +19,7 @@ class LitLLMConfig(pydantic.BaseModel):
     # Model Fields
     # ============
 
-    hidden_features: int = 256
+    hidden_features: int = 512
     num_layers: int = 16
 
     norm: Literal["rms", "layer"] = "layer"
@@ -48,12 +48,11 @@ class LitLLM(pl.LightningModule):
         self.config: LitLLMConfig = LitLLMConfig.parse_obj(config)
         cfg = self.config
 
-        self.tokenizer = PlasmidTokenizer()
         self.mamba = MambaLMHeadModel(
             config=MambaConfig(
                 d_model=cfg.hidden_features,
                 n_layer=cfg.num_layers,
-                vocab_size=self.tokenizer.vocab_size,
+                vocab_size=TOKENIZER.vocab_size,
                 rms_norm=(cfg.norm == "rms"),
                 residual_in_fp32=True,
                 fused_add_norm=cfg.fused_add_norm,
