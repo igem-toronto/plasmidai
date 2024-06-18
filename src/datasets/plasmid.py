@@ -59,7 +59,7 @@ class PlasmidDataModule(pl.LightningDataModule):
         self.datasets = {}
         for split, group in df.groupby("split"):
             examples = [records[k] for k in group["id"]]
-            self.datasets[split] = PlasmidDataset(examples, tokenizer, Lmax=Lmax)
+            self.datasets[split] = PlasmidDataset(examples, Lmax=Lmax)
 
     def train_dataloader(self):
         return self._loader(split="train")
