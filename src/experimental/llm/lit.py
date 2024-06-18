@@ -20,7 +20,7 @@ class LitLLMConfig(pydantic.BaseModel):
     # ============
 
     hidden_features: int = 512
-    num_layers: int = 16
+    num_layers: int = 22
 
     norm: Literal["rms", "layer"] = "layer"
     fused_add_norm: bool = False
