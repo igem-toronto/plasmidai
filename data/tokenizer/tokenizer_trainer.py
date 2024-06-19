@@ -34,7 +34,9 @@ DATASET_TXT = f'{DATA_ROOT}/plasmids.txt'
 DATASET_DUMMY =f'{DATA_ROOT}/plasmids_dummy.txt'
 DATASET_FINETUNE = f'{DATA_ROOT}/plasmids_finetune.txt'
 DATASET_CUTOFF = f'{DATA_ROOT}/plasmids_cutoff.txt'
-TOKENIZER = f'{DATA_ROOT}/tokenizer/dna_bpe_tokenizer_finetune.json'
+DATASET_CUTOFF_RC = f'{DATA_ROOT}/plasmids_cutoff_rc.txt'
+
+TOKENIZER = f'{DATA_ROOT}/tokenizer/dna_bpe_tokenizer_cutoff_rc.json'
 
 SEED = 42
 VOCAB_SIZE = 4096
@@ -76,7 +78,7 @@ if __name__ == '__main__':
     )
 
     # Train tokenizer
-    tokenizer.train([DATASET_CUTOFF], trainer)
+    tokenizer.train([DATASET_CUTOFF_RC], trainer)
 
     # Set post-processor with correct special token references
     tokenizer.post_processor = TemplateProcessing(
