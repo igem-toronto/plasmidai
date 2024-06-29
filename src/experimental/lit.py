@@ -142,4 +142,4 @@ class LitLLM(pl.LightningModule):
             vocab_size=(4 + 1),
         )
         samples = samples[..., 1:]  # remove prompt
-        return [self.tokenizer.decode(x) for x in samples]
+        return [TOKENIZER.decode(x) for x in samples]
