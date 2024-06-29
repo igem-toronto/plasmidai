@@ -27,9 +27,9 @@ class LitLLM(pl.LightningModule):
         wd: float = 0.1,
         scheduler_shape: Literal["hump", "flat"] = "hump",
         scheduler_span: int = 100000,
-        num_samples_per_epoch: int = 10,
+        num_samples_per_epoch: int = 20,
         top_k: int = -1,
-        top_p: float = 0.0,
+        top_p: float = 0.9,
         min_p: float = 0.0,
         temperature: float = 1.0,
         repetition_penalty: float = 1.0,
@@ -97,8 +97,12 @@ class LitLLM(pl.LightningModule):
     def on_validation_epoch_end(self) -> None:
         if (self.logger is None) or (self.global_rank != 0):
             return
-        data = [[x] for x in self._sample()]
-        self.logger.log_text("samples", columns=["sequence"], data=data)
+        self.logger.log_text(
+            "samples",
+            columns=["sequence"],
+            data=[[x] for x in self._sample()],
+            step=self.current_epoch,
+        )
 
     def _step(self, batch, split):
         dnas, mask, finetune = batch
