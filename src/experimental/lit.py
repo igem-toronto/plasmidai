@@ -29,7 +29,7 @@ class LitLLM(pl.LightningModule):
         scheduler_span: int = 100000,
         num_samples_per_epoch: int = 20,
         top_k: int = -1,
-        top_p: float = 0.9,
+        top_p: float = 0.0,
         min_p: float = 0.0,
         temperature: float = 1.0,
         repetition_penalty: float = 1.0,
