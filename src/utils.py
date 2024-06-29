@@ -1,9 +1,18 @@
-from typing import Optional
+from typing import Literal, Optional
 
+import lightning.pytorch as pl
 import torch
 from transformers import BatchEncoding, PreTrainedTokenizerFast
 
 from src.paths import DATA_ROOT
+
+
+def configure_torch_backends(
+    seed: int = 100,
+    matmul_precision: Literal["medium", "high", "highest"] = "highest",
+):
+    pl.seed_everything(seed, workers=True)
+    torch.set_float32_matmul_precision(matmul_precision)
 
 
 class PlasmidTokenizer:
