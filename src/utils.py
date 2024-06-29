@@ -150,7 +150,7 @@ class PlasmidTokenizer:
         return self.tokenizer.convert_ids_to_tokens(id_sequence)
 
 
-TOKENIZER = PlasmidTokenizer(DATA_ROOT / "tokenizer" / "dna_bpe_tokenizer_offset.json")
+TOKENIZER = PlasmidTokenizer(DATA_ROOT / "tokenizer" / "dna_bpe_tokenizer_cutoff_rc.json")
 
 
 def random_circular_crop(dna, Lmax):
