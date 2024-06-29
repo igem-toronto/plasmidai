@@ -1,5 +1,5 @@
+import lightning.pytorch as pl
 import pandas as pd
-import pytorch_lightning as pl
 import torch
 from Bio import SeqIO
 from torch.utils.data import DataLoader, Dataset

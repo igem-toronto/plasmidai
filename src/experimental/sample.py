@@ -11,7 +11,7 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from torch.utils.data import DataLoader
 
-from src.experimental.llm.lit import LitLLM
+from src.experimental.lit import LitLLM
 from src.utils import PlasmidTokenizer
 
 
