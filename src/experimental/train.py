@@ -1,7 +1,7 @@
 from typing import Literal, Optional
 
 import jsonargparse
-import pytorch_lightning as pl
+import lightning.pytorch as pl
 
 from src.datasets.plasmid import PlasmidDataModule
 from src.experimental.callbacks import GradNormMonitor
