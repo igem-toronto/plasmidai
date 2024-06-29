@@ -143,7 +143,7 @@ class LitLLM(pl.LightningModule):
             min_p=hp.min_p,
             temperature=hp.temperature,
             repetition_penalty=hp.repetition_penalty,
-            vocab_size=(4 + 1),
+            vocab_size=TOKENIZER.vocab_size,
         )
         samples = samples[..., 1:]  # remove prompt
         return [TOKENIZER.decode(x) for x in samples]
