@@ -131,7 +131,7 @@ class LitLLM(pl.LightningModule):
         hp = self.hparams
         sos = TOKENIZER.vocab[TOKENIZER.cls_token]
         sos = torch.full([hp.num_samples_per_epoch, 1], sos, device=self.device)
-        samples = self.model.generate(
+        samples = self.generate(
             input_ids=sos,
             max_length=hp.Lmax,
             top_k=hp.top_k,
