@@ -97,8 +97,8 @@ class LitLLM(pl.LightningModule):
     def on_validation_epoch_end(self) -> None:
         if (self.logger is None) or (self.global_rank != 0):
             return
-        samples = self._sample()
-        self.logger.log_text("samples", columns=["sequence"], data=samples)
+        data = [[x] for x in self._sample()]
+        self.logger.log_text("samples", columns=["sequence"], data=data)
 
     def _step(self, batch, split):
         dnas, mask, finetune = batch
