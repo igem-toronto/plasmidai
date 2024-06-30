@@ -73,6 +73,7 @@ class SimpleTrainer(pl.Trainer):
             limit_val_batches=val_steps_per_epoch,
             log_every_n_steps=log_every_n_steps,
             enable_progress_bar=progress_bar,
+            reload_dataloaders_every_n_epochs=1,
             use_distributed_sampler=True,
         )
 
