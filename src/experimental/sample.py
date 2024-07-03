@@ -1,137 +1,66 @@
-import pathlib
-from typing import Literal
+from typing import Optional
 
-import einops
-import pydantic
-import pydantic_cli
-import pytorch_lightning as pl
+import jsonargparse
 import torch
-from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from torch.utils.data import DataLoader
+import tqdm
+import wandb
 
 from src.experimental.lit import LitLLM
-from src.utils import PlasmidTokenizer
+from src.paths import LOG_DIR
+from src.utils import configure_torch_backends
 
 
-class LLMSampleConfig(pydantic.BaseModel):
-
-    seed: int = 100
-    checkpoint_path: str
-
-    accelerator: Literal["cpu", "gpu"] = "cpu"
-    matmul_precision: Literal["medium", "high", "highest"] = "highest"
-    precision: Literal["32", "16-mixed", "bf16-mixed"] = "32"
-
-    # =============
-    # Sample Fields
-    # =============
-
-    samples_path: str
-
-    num_samples: int = 10000
-    batch_size: int = 50
-
-    sample_max_length: int = 10000
-    sample_top_k: int = 4
-    sample_top_p: float = 0.0
-    sample_min_p: float = 0.0
-    sample_temperature: float = 0.7
-    repetition_penalty: float = 1.0
-
-    class Config(pydantic_cli.DefaultConfig):
-        extra = "forbid"
-        CLI_BOOL_PREFIX = ("--enable_", "--disable_")
-
-
-class LLMSampler(pl.LightningModule):
-
-    def __init__(self, config: LLMSampleConfig, model):
-        super().__init__()
-
-        self.config = config
-        self.model = model
-        self.model.eval()
-        self.tokenizer = PlasmidTokenizer()
-
-        if config.precision.startswith("16"):
-            self.model.half()
-        elif config.precision.startswith("bf16"):
-            self.model.bfloat16()
-        else:
-            self.model.float()
-
-    def predict_step(self, batch):
-        cfg = self.config
-        samples = self.model.generate(
-            input_ids=batch,
-            max_length=cfg.sample_max_length,
-            top_k=cfg.sample_top_k,
-            top_p=cfg.sample_top_p,
-            min_p=cfg.sample_min_p,
-            temperature=cfg.sample_temperature,
-            repetition_penalty=cfg.repetition_penalty,
-            vocab_size=(4 + 1),
-        )
-        samples = samples[..., batch.shape[-1]:]  # remove prompt
-        samples = [self.tokenizer.decode(x) for x in samples]
-        return samples
-
-
-def sample(config: LLMSampleConfig):
-    cfg = config
-
-    # Torch settings
-    torch.set_float32_matmul_precision(cfg.matmul_precision)
-
-    # Seeding
-    pl.seed_everything(cfg.seed, workers=True)
-
-    # Load checkpoint
-    lit = LitLLM.load_from_checkpoint(cfg.checkpoint_path, map_location="cpu")
-    model = LLMSampler(cfg, lit)
-
-    # Load dataset
-    prompts = model.tokenizer.tokenize("", eos=False)
-    prompts = einops.repeat(prompts, "c -> n c", n=cfg.num_samples)
-    predict_loader = DataLoader(
-        dataset=prompts,
-        batch_size=cfg.batch_size,
-        shuffle=False,
-        drop_last=False,
-        num_workers=0,
+def sample_loop(
+    checkpoint_path: str,
+    num_samples: int = 10000,
+    batch_size: int = 50,
+    top_k: int = -1,
+    top_p: float = 0.0,
+    min_p: float = 0.0,
+    temperature: float = 1.0,
+    repetition_penalty: float = 1.0,
+    wandb_dir: str = str(LOG_DIR),
+    wandb_project: str = "sample_plasmid_llm",
+    wandb_entity: Optional[str] = None,
+):
+    sample_kwargs = dict(
+        checkpoint_path=checkpoint_path,
+        num_samples_per_epoch=batch_size,
+        top_k=top_k,
+        top_p=top_p,
+        min_p=min_p,
+        temperature=temperature,
+        repetition_penalty=repetition_penalty,
     )
 
-    # Initialize trainer
-    trainer = pl.Trainer(
-        accelerator=cfg.accelerator,
-        strategy="auto",
-        devices=1,
-        precision=cfg.precision,
-        enable_checkpointing=False,
-        logger=False,
-        enable_progress_bar=True,
-        use_distributed_sampler=True,
-        log_every_n_steps=1,
-    )
+    wandb.init(project=wandb_project, entity=wandb_entity, dir=wandb_dir)
+    lit: LitLLM = LitLLM.load_from_checkpoint(**sample_kwargs, map_location="cpu")
+    lit.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
+    lit.eval()
 
-    # Sample
-    samples = trainer.predict(model, dataloaders=predict_loader)
-    samples = sum(samples, [])  # flatten
+    samples = []
+    for _ in tqdm.trange(num_samples // batch_size, desc="Sampling"):
+        samples += [[x.replace(" ", "")] for x in lit._sample()]
+    table = wandb.Table(columns=["sequence"], data=samples)
+    wandb.log({"samples": table})
 
-    # Write to fasta
-    samples_path = pathlib.Path(cfg.samples_path)
-    samples_path.parent.mkdir(parents=True, exist_ok=True)
+    wandb.finish()
 
-    records = [
-        SeqRecord(seq=Seq(plasmid), id=f"sample_{i}", description="")
-        for i, plasmid in enumerate(samples)
-    ]
-    SeqIO.write(records, samples_path, "fasta")
 
-    return 0
+def sample():
+    parser = jsonargparse.ArgumentParser()
+
+    # Populate arguments
+    parser.add_function_arguments(configure_torch_backends, "backend")
+    parser.add_function_arguments(sample_loop, "sample")
+
+    # Parse
+    cfg = parser.parse_args()
+
+    # Call
+    configure_torch_backends(**vars(cfg.backend))
+    sample_loop(**vars(cfg.sample))
 
 
 if __name__ == "__main__":
-    pydantic_cli.run_and_exit(LLMSampleConfig, sample)
+    sample()
