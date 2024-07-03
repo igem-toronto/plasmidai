@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 
 import jsonargparse
 import torch
@@ -10,8 +10,10 @@ from src.paths import LOG_DIR
 from src.utils import configure_torch_backends
 
 
+@torch.no_grad()
 def sample_loop(
     checkpoint_path: str,
+    precision: Literal["float", "half", "bfloat16"] = "float",
     num_samples: int = 10000,
     batch_size: int = 50,
     top_k: int = -1,
@@ -33,17 +35,19 @@ def sample_loop(
         repetition_penalty=repetition_penalty,
     )
 
-    wandb.init(project=wandb_project, entity=wandb_entity, dir=wandb_dir)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     lit: LitLLM = LitLLM.load_from_checkpoint(**sample_kwargs, map_location="cpu")
-    lit.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
+    lit.to(device)
     lit.eval()
 
     samples = []
-    for _ in tqdm.trange(num_samples // batch_size, desc="Sampling"):
-        samples += [[x.replace(" ", "")] for x in lit._sample()]
+    with torch.autocast(device_type=device, dtype=getattr(torch, precision)):
+        for _ in tqdm.trange(num_samples // batch_size, desc="Sampling"):
+            samples += [[x.replace(" ", "")] for x in lit._sample()]
     table = wandb.Table(columns=["sequence"], data=samples)
-    wandb.log({"samples": table})
 
+    wandb.init(project=wandb_project, entity=wandb_entity, dir=wandb_dir)
+    wandb.log({"samples": table})
     wandb.finish()
 
 
