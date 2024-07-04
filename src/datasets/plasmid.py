@@ -5,7 +5,7 @@ from Bio import SeqIO
 from torch.utils.data import DataLoader, Dataset
 
 from src.paths import DATA_ROOT
-from src.utils import TOKENIZER, random_circular_crop
+from src.utils import TOKENIZER, random_roll
 
 
 class PlasmidDataset(Dataset):
@@ -23,7 +23,7 @@ class PlasmidDataset(Dataset):
         record = self.records[idx]
 
         # Crop & augment
-        dna = random_circular_crop(record.seq, Lmax=self.Lmax)  # Bio.Seq object
+        dna = random_roll(record.seq)  # Bio.Seq object
         if torch.rand(1) < 0.5:
             dna = dna.reverse_complement()
         dna = str(dna)
@@ -41,7 +41,7 @@ class PlasmidDataset(Dataset):
 
 class PlasmidDataModule(pl.LightningDataModule):
 
-    def __init__(self, Lmax=2100, batch_size=10, num_workers=0, finetune=False):
+    def __init__(self, Lmax=2048, batch_size=10, num_workers=0, finetune=False):
         super().__init__()
 
         self.batch_size = batch_size
