@@ -27,7 +27,7 @@ class LitLLM(pl.LightningModule):
         wd: float = 0.1,
         scheduler_shape: Literal["hump", "flat"] = "hump",
         scheduler_span: int = 100000,
-        num_samples_per_epoch: int = 20,
+        num_samples_per_epoch: int = 10,
         top_k: int = -1,
         top_p: float = 0.0,
         min_p: float = 0.0,
