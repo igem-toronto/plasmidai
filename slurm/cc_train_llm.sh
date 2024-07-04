@@ -24,7 +24,7 @@ export TORCH_NCCL_BLOCKING_WAIT=1
 
 srun python -m src.experimental.train \
     --backend.matmul_precision=medium \
-    --data.batch_size=64 --data.num_workers=4 \
+    --data.batch_size=64 --data.num_workers=6 \
     --lit.fused_add_norm=true --lit.scheduler_span=50000 --lit.top_p=0.9 \
     --trainer.accelerator=gpu  --trainer.devices=2 --trainer.precision=bf16-mixed \
     --trainer.wandb=true --trainer.wandb_dir="${REPO_ROOT}/logs" \

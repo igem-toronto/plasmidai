@@ -81,8 +81,11 @@ class PlasmidTokenizer:
 TOKENIZER = PlasmidTokenizer(DATA_ROOT / "tokenizer" / "dna_bpe_tokenizer_cutoff_rc.json")
 
 
-def random_roll(dna):
+def random_circular_crop(dna, L):
     start = torch.randint(len(dna), size=[1]).item()
-    roll = dna[start:] + dna[:start]
-    assert len(roll) == len(dna)
-    return roll
+    L = min(len(dna), L)
+    crop = dna[start:(start + L)]
+    overhang = L - len(crop)  # wrap around to start
+    crop = crop + dna[:overhang]
+    assert len(crop) == L
+    return crop
