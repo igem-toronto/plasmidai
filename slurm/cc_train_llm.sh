@@ -30,4 +30,4 @@ srun python -m src.experimental.train \
     --trainer.wandb=true --trainer.wandb_dir="${REPO_ROOT}/logs" \
     --trainer.checkpoint=true --trainer.checkpoint_dir="${REPO_ROOT}/checkpoints/$(date +'%Y-%m-%d-%H-%M')" \
     --trainer.progress_bar=true \
-    --trainer.max_epochs=125 --trainer.train_steps_per_epoch=500 --trainer.val_steps_per_epoch=500
+    --trainer.max_epochs=175
