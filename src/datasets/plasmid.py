@@ -5,7 +5,7 @@ from Bio import SeqIO
 from torch.utils.data import DataLoader, Dataset
 
 from src.paths import DATA_ROOT
-from src.utils import TOKENIZER, random_roll
+from src.utils import TOKENIZER, random_circular_crop
 
 
 class PlasmidDataset(Dataset):
@@ -16,6 +16,9 @@ class PlasmidDataset(Dataset):
         self.records = list(records)
         self.Lmax = Lmax  # max number of nt in input sequence
 
+        # Maximum length of DNA that can be produced by Lmax tokens
+        self.Lcrop = Lmax * max(len(x) for x in TOKENIZER.vocab)
+
     def __len__(self):
         return len(self.records)
 
@@ -23,7 +26,7 @@ class PlasmidDataset(Dataset):
         record = self.records[idx]
 
         # Crop & augment
-        dna = random_roll(record.seq)  # Bio.Seq object
+        dna = random_circular_crop(record.seq, L=self.Lcrop)  # Bio.Seq object
         if torch.rand(1) < 0.5:
             dna = dna.reverse_complement()
         dna = str(dna)
