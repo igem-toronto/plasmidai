@@ -9,34 +9,17 @@ from tokenizers.processors import TemplateProcessing
 from tokenizers.normalizers import Normalizer, Replace, Lowercase
 
 
-LETTER_TO_BASES = {
-    "A": "A",
-    "B": "CGT",
-    "C": "C",
-    "D": "AGT",
-    "G": "G",
-    "H": "ACT",
-    "K": "GT",
-    "M": "AC",
-    "N": "ACGT",
-    "R": "AG",
-    "S": "CG",
-    "T": "T",
-    "V": "ACG",
-    "W": "AT",
-    "Y": "CT",
-}
-
 ROOT = '/scratch/adibvafa/plasmid-ai/'
 DATA_ROOT = f'{ROOT}/data'
-DATASET = f'{DATA_ROOT}/plasmids.fasta'
-DATASET_TXT = f'{DATA_ROOT}/plasmids.txt'
-DATASET_DUMMY =f'{DATA_ROOT}/plasmids_dummy.txt'
-DATASET_FINETUNE = f'{DATA_ROOT}/plasmids_finetune.txt'
-DATASET_CUTOFF = f'{DATA_ROOT}/plasmids_cutoff.txt'
-DATASET_CUTOFF_RC = f'{DATA_ROOT}/plasmids_cutoff_rc.txt'
+BASE_FILE = f'plasmids_replicon'
+DATASET = f'{DATA_ROOT}/{BASE_FILE}.fasta'
+DATASET_TXT = f'{DATA_ROOT}/{BASE_FILE}.txt'
+DATASET_CUTOFF = f'{DATA_ROOT}/{BASE_FILE}_cutoff.txt'
+DATASET_DUMMY =f'{DATA_ROOT}/{BASE_FILE}_dummy.txt'
+DATASET_FINETUNE = f'{DATA_ROOT}/{BASE_FILE}_finetune.txt'
+DATASET_CUTOFF_RC = f'{DATA_ROOT}/{BASE_FILE}_cutoff_rc.txt'
 
-TOKENIZER = f'{DATA_ROOT}/tokenizer/dna_bpe_tokenizer_cutoff_rc.json'
+TOKENIZER = f'{DATA_ROOT}/tokenizer/{BASE_FILE}_dna_bpe_tokenizer_cutoff_rc.json'
 
 SEED = 42
 VOCAB_SIZE = 4096
