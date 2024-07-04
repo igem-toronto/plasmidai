@@ -18,7 +18,7 @@ class LitLLM(pl.LightningModule):
     def __init__(
         self,
         hidden_features: int = 512,
-        Lmax: int = 2100,
+        Lmax: int = 2048,
         num_layers: int = 22,
         norm: Literal["rms", "layer"] = "layer",
         fused_add_norm: bool = False,
@@ -99,8 +99,8 @@ class LitLLM(pl.LightningModule):
             return
         self.logger.log_text(
             "samples",
-            columns=["sequence"],
-            data=[[x] for x in self._sample()],
+            columns=["sequence", "length"],
+            data=[[x, len(x.replace(" ", ""))] for x in self._sample()],
             step=self.current_epoch,
         )
 

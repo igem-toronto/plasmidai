@@ -55,7 +55,7 @@ class PlasmidTokenizer:
         self,
         dna: str,
         max_length: Optional[int] = None,
-        truncation: bool = False,
+        truncation: bool = True,
         padding: str = "max_length",
         return_attention_mask: bool = False,
         return_token_type_ids: bool = False,
@@ -81,11 +81,8 @@ class PlasmidTokenizer:
 TOKENIZER = PlasmidTokenizer(DATA_ROOT / "tokenizer" / "dna_bpe_tokenizer_cutoff_rc.json")
 
 
-def random_circular_crop(dna, Lmax):
+def random_roll(dna):
     start = torch.randint(len(dna), size=[1]).item()
-    L = min(len(dna), Lmax)
-    crop = dna[start:(start + L)]
-    overhang = L - len(crop)  # wrap around to start
-    crop = crop + dna[:overhang]
-    assert len(crop) == L
-    return crop
+    roll = dna[start:] + dna[:start]
+    assert len(roll) == len(dna)
+    return roll
