@@ -4,7 +4,7 @@
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32GB
-#SBATCH --time=0-08:00
+#SBATCH --time=0-03:00
 #SBATCH --output=logs/%N-%j.out
 
 export PROJECT=~/projects/def-mikeuoft/alstonlo
@@ -23,6 +23,6 @@ wandb offline
 srun python -m src.experimental.sample \
     --backend.matmul_precision=medium \
     --sample.checkpoint_path="${REPO_ROOT}/checkpoints/57-19-30-06-2024/last.ckpt" \
-    --sample.precision=bfloat16 --sample.num_samples=100 --sample.top_p=0.9
+    --sample.precision=bfloat16 --sample.num_samples=10000 --sample.top_p=0.9
     --sample.wandb_dir="${REPO_ROOT}/logs"
 
