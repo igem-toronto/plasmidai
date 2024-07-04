@@ -25,6 +25,9 @@ def sample_loop(
     wandb_project: str = "sample_plasmid_llm",
     wandb_entity: Optional[str] = None,
 ):
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    dtype = getattr(torch, precision)
+
     sample_kwargs = dict(
         checkpoint_path=checkpoint_path,
         num_samples_per_epoch=batch_size,
@@ -35,18 +38,22 @@ def sample_loop(
         repetition_penalty=repetition_penalty,
     )
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
     lit: LitLLM = LitLLM.load_from_checkpoint(**sample_kwargs, map_location="cpu")
-    lit.to(device)
+    lit.to(device=device, dtype=dtype)
     lit.eval()
 
     samples = []
-    with torch.autocast(device_type=device, dtype=getattr(torch, precision)):
+    with torch.autocast(device_type=device, dtype=dtype):
         for _ in tqdm.trange(num_samples // batch_size, desc="Sampling"):
             samples += [[x.replace(" ", "")] for x in lit._sample()]
     table = wandb.Table(columns=["sequence"], data=samples)
 
-    wandb.init(project=wandb_project, entity=wandb_entity, dir=wandb_dir)
+    wandb.init(
+        project=wandb_project,
+        entity=wandb_entity,
+        dir=wandb_dir,
+        config=dict(**sample_kwargs, precision=precision)
+    )
     wandb.log({"samples": table})
     wandb.finish()
 
