@@ -3,12 +3,11 @@ from typing import List, Literal
 
 import lightning.pytorch as pl
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from lightning.pytorch.utilities import rank_zero_only
 from mamba_ssm.models.mixer_seq_simple import MambaConfig, MambaLMHeadModel
-from torchmetrics import MeanMetric
 
+from src.datasets import build_tokenizer
 from src.experimental.optimizers import build_optimizer_and_scheduler
 from src.utils import TOKENIZER
 
@@ -17,8 +16,8 @@ class LitLLM(pl.LightningModule):
 
     def __init__(
         self,
+        tokenizer: str,
         hidden_features: int = 512,
-        Lmax: int = 2048,
         num_layers: int = 22,
         norm: Literal["rms", "layer"] = "layer",
         fused_add_norm: bool = False,
@@ -28,6 +27,7 @@ class LitLLM(pl.LightningModule):
         scheduler_shape: Literal["hump", "flat"] = "hump",
         scheduler_span: int = 100000,
         num_samples_per_epoch: int = 10,
+        max_length: int = 2048,
         top_k: int = -1,
         top_p: float = 0.0,
         min_p: float = 0.0,
@@ -38,6 +38,7 @@ class LitLLM(pl.LightningModule):
 
         self.save_hyperparameters()
 
+        self.tokenizer = build_tokenizer(tokenizer)
         self.mamba = MambaLMHeadModel(
             config=MambaConfig(
                 d_model=hidden_features,
@@ -49,8 +50,6 @@ class LitLLM(pl.LightningModule):
                 pad_vocab_size_multiple=1,
             )
         )
-
-        self.metrics = nn.ModuleDict({"train_": MeanMetric(), "val_": MeanMetric()})
 
     def generate(self, *args, **kwargs):
         return self.mamba.generate(*args, **kwargs)
@@ -105,45 +104,37 @@ class LitLLM(pl.LightningModule):
         )
 
     def _step(self, batch, split):
-        dnas, mask, finetune = batch
-        # (B L+1) (B L+1) (B)
+        dnas, mask = batch
+        # (... L+1) (... L+1)
 
         # Forward pass
-        logits = self.mamba(dnas[..., :-1]).logits.mT  # (B C L)
-        mask = mask[..., 1:]  # (B L)
+        logits = self.mamba(dnas[..., :-1]).logits.mT  # (... C L)
+        mask = mask[..., 1:]  # (... L)
 
         # Compute loss
         num_tokens = mask.int().sum()
-        losses = F.cross_entropy(logits, dnas[..., 1:], reduction="none")  # (B L)
+        losses = F.cross_entropy(logits, dnas[..., 1:], reduction="none")  # (... L)
         losses = torch.where(mask, losses, 0)
         loss = losses.sum() / num_tokens.float()
 
-        # Subset to finetuning plasmids
-        with torch.no_grad():
-            mask_finetune = finetune.unsqueeze(-1) & mask
-            loss_finetune = self.metrics[f"{split}_"]
-            loss_finetune.update(losses, mask_finetune.float())
-
         # Logging
         self.log(f"{split}/loss", loss, batch_size=num_tokens, sync_dist=(split != "train"))
-        self.log(f"{split}/loss_finetune", loss_finetune, on_step=False, on_epoch=True)
 
         return loss
 
     @rank_zero_only
     def _sample(self):
         hp = self.hparams
-        sos = TOKENIZER.vocab[TOKENIZER.cls_token]
-        sos = torch.full([hp.num_samples_per_epoch, 1], sos, device=self.device)
+        sos = torch.full([hp.num_samples_per_epoch, 1], self.tokenizer.sos_idx, device=self.device)
         samples = self.generate(
             input_ids=sos,
-            max_length=hp.Lmax,
+            max_length=hp.max_length,
             top_k=hp.top_k,
             top_p=hp.top_p,
             min_p=hp.min_p,
             temperature=hp.temperature,
             repetition_penalty=hp.repetition_penalty,
-            vocab_size=TOKENIZER.vocab_size,
+            vocab_size=self.tokenizer.vocab_size,
         )
         samples = samples[..., 1:]  # remove prompt
-        return [TOKENIZER.decode(x) for x in samples]
+        return [self.tokenizer.decode(x) for x in samples]

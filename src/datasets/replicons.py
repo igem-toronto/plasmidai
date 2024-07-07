@@ -6,20 +6,15 @@ from torch.utils.data import DataLoader, Dataset
 
 from src.datasets.tokenizers import build_tokenizer
 from src.paths import DATA_ROOT
-from src.utils import random_circular_crop
 
 
-class PlasmidDataset(Dataset):
+class RepliconDataset(Dataset):
 
-    def __init__(self, records, tokenizer, Lmax):
+    def __init__(self, records, tokenizer):
         super().__init__()
 
         self.records = list(records)
         self.tokenizer = tokenizer
-        self.Lmax = Lmax  # max number of nt in input sequence
-
-        # Maximum length of DNA that can be produced by Lmax tokens
-        self.Lcrop = Lmax * max(len(x) for x in self.tokenizer.vocab)
 
     def __len__(self):
         return len(self.records)
@@ -28,44 +23,40 @@ class PlasmidDataset(Dataset):
         record = self.records[idx]
 
         # Crop & augment
-        dna = random_circular_crop(record.seq, L=self.Lcrop)  # Bio.Seq object
+        dna = record.seq
         if torch.rand(1) < 0.5:
             dna = dna.reverse_complement()
         dna = str(dna)
 
         # Tokenize
-        sequence = self.tokenizer.tokenize(dna, L=self.Lmax)
-        mask = (sequence != self.tokenizer.pad_idx)
-        return sequence, mask
+        return self.tokenizer.tokenize(dna)[0]
 
 
-class PlasmidDataModule(pl.LightningDataModule):
+class RepliconDataModule(pl.LightningDataModule):
 
     def __init__(
         self,
-        tokenizer: str = str(DATA_ROOT / "tokenizer" / "dna_bpe_tokenizer_cutoff_rc.json"),
-        Lmax: int = 2048,
+        tokenizer: str = "nt",
+        max_tokens: int = 131072,
         batch_size: int = 10,
         num_workers: int = 0,
-        finetune: bool = False,
     ):
         super().__init__()
 
         self.tokenizer = build_tokenizer(tokenizer)
+        self.max_tokens = max_tokens
         self.batch_size = batch_size
         self.num_workers = num_workers
 
         records = SeqIO.parse(DATA_ROOT / f"plasmids.fasta", "fasta")
         records = {r.id: r for r in records}
 
-        df = pd.read_csv(DATA_ROOT / "plasmids.splits.csv")
-        if finetune:
-            df = df[df["finetune"]]
+        df = pd.read_csv(DATA_ROOT / "splits.csv")
 
         self.datasets = {}
         for split, group in df.groupby("split"):
             examples = [records[k] for k in group["id"]]
-            self.datasets[split] = PlasmidDataset(examples, self.tokenizer, Lmax=Lmax)
+            self.datasets[split] = RepliconDataset(examples, self.tokenizer)
 
     def train_dataloader(self):
         return self._loader(split="train")
@@ -83,5 +74,9 @@ class PlasmidDataModule(pl.LightningDataModule):
             shuffle=shuffle,
             drop_last=drop_last,
             num_workers=self.num_workers,
+            collate_fn=self._collate,
             pin_memory=True,
         )
+
+    def _collate(self, batch):
+        pass
