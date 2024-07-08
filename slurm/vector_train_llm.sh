@@ -12,7 +12,7 @@
 #SBATCH --output=logs/slurm-%j.out
 
 source ~/.bashrc
-conda activate plasmid-ai
+conda activate plasmid-lm
 
 cd ..
 

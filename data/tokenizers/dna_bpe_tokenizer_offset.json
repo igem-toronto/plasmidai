@@ -108,7 +108,7 @@
     "pair": [
       {
         "SpecialToken": {
-          "id": "[CLS]",
+          "id": "[SEP]",
           "type_id": 0
         }
       },

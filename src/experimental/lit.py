@@ -7,9 +7,8 @@ import torch.nn.functional as F
 from lightning.pytorch.utilities import rank_zero_only
 from mamba_ssm.models.mixer_seq_simple import MambaConfig, MambaLMHeadModel
 
-from src.datasets import build_tokenizer
+from src.datasets import DNATokenizer
 from src.experimental.optimizers import build_optimizer_and_scheduler
-from src.utils import TOKENIZER
 
 
 class LitLLM(pl.LightningModule):
@@ -38,12 +37,12 @@ class LitLLM(pl.LightningModule):
 
         self.save_hyperparameters()
 
-        self.tokenizer = build_tokenizer(tokenizer)
+        self.tokenizer = DNATokenizer(tokenizer)
         self.mamba = MambaLMHeadModel(
             config=MambaConfig(
                 d_model=hidden_features,
                 n_layer=num_layers,
-                vocab_size=TOKENIZER.vocab_size,
+                vocab_size=len(self.tokenizer),
                 rms_norm=(norm == "rms"),
                 residual_in_fp32=True,
                 fused_add_norm=fused_add_norm,
@@ -125,16 +124,20 @@ class LitLLM(pl.LightningModule):
     @rank_zero_only
     def _sample(self):
         hp = self.hparams
-        sos = torch.full([hp.num_samples_per_epoch, 1], self.tokenizer.sos_idx, device=self.device)
+        bos = torch.full(
+            size=[hp.num_samples_per_epoch, 1],
+            fill_value=self.tokenizer.bos_token_id,
+            device=self.device,
+        )
         samples = self.generate(
-            input_ids=sos,
+            input_ids=bos,
             max_length=hp.max_length,
             top_k=hp.top_k,
             top_p=hp.top_p,
             min_p=hp.min_p,
             temperature=hp.temperature,
             repetition_penalty=hp.repetition_penalty,
-            vocab_size=self.tokenizer.vocab_size,
+            vocab_size=len(self.tokenizer),
         )
         samples = samples[..., 1:]  # remove prompt
-        return [self.tokenizer.decode(x) for x in samples]
+        return [self.tokenizer.decode_dna(x) for x in samples]
