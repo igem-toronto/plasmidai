@@ -161,7 +161,7 @@ cython_debug/
 .DS_Store
 
 data/**/*.fasta
-data/DB*
+data/**/*.tsv
 data/tmp
 data/*.npz
 sandbox

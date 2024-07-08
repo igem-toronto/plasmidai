@@ -4,7 +4,7 @@ import torch
 from Bio import SeqIO
 from torch.utils.data import DataLoader, Dataset
 
-from src.datasets.tokenizers import build_tokenizer
+from src.datasets.utils import DNATokenizer
 from src.paths import DATA_ROOT
 from src.utils import random_circular_crop
 
@@ -34,8 +34,8 @@ class PlasmidDataset(Dataset):
         dna = str(dna)
 
         # Tokenize
-        sequence = self.tokenizer.tokenize(dna, L=self.Lmax)
-        mask = (sequence != self.tokenizer.pad_idx)
+        sequence = self.tokenizer.tokenize_dna(dna, max_length=self.Lmax)
+        mask = (sequence != self.tokenizer.pad_token_id)
         return sequence, mask
 
 
@@ -43,7 +43,7 @@ class PlasmidDataModule(pl.LightningDataModule):
 
     def __init__(
         self,
-        tokenizer: str = str(DATA_ROOT / "tokenizer" / "dna_bpe_tokenizer_cutoff_rc.json"),
+        tokenizer: str = str(DATA_ROOT / "tokenizers" / "dna_bpe_tokenizer_cutoff_rc.json"),
         Lmax: int = 2048,
         batch_size: int = 10,
         num_workers: int = 0,
@@ -51,7 +51,7 @@ class PlasmidDataModule(pl.LightningDataModule):
     ):
         super().__init__()
 
-        self.tokenizer = build_tokenizer(tokenizer)
+        self.tokenizer = DNATokenizer(tokenizer)
         self.batch_size = batch_size
         self.num_workers = num_workers
 

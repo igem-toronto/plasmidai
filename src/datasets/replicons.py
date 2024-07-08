@@ -4,7 +4,7 @@ import torch
 from Bio import SeqIO
 from torch.utils.data import DataLoader, Dataset
 
-from src.datasets.tokenizers import build_tokenizer
+from src.datasets.utils import DNATokenizer
 from src.paths import DATA_ROOT
 
 
@@ -29,29 +29,29 @@ class RepliconDataset(Dataset):
         dna = str(dna)
 
         # Tokenize
-        return self.tokenizer.tokenize(dna)[0]
+        return self.tokenizer.tokenize_dna(dna)
 
 
 class RepliconDataModule(pl.LightningDataModule):
 
     def __init__(
         self,
-        tokenizer: str = "nt",
-        max_tokens: int = 131072,
+        tokenizer: str = str(DATA_ROOT / "tokenizers" / "tokenizer_nt.json"),
+        max_tokens: int = (2048 * 64),
         batch_size: int = 10,
         num_workers: int = 0,
     ):
         super().__init__()
 
-        self.tokenizer = build_tokenizer(tokenizer)
+        self.tokenizer = DNATokenizer(tokenizer)
         self.max_tokens = max_tokens
         self.batch_size = batch_size
         self.num_workers = num_workers
 
-        records = SeqIO.parse(DATA_ROOT / f"plasmids.fasta", "fasta")
+        records = SeqIO.parse(DATA_ROOT / f"replicons.fasta", "fasta")
         records = {r.id: r for r in records}
 
-        df = pd.read_csv(DATA_ROOT / "splits.csv")
+        df = pd.read_csv(DATA_ROOT / "replicons.splits.csv")
 
         self.datasets = {}
         for split, group in df.groupby("split"):
@@ -78,5 +78,9 @@ class RepliconDataModule(pl.LightningDataModule):
             pin_memory=True,
         )
 
+    # e.g., [SEP] A [SEP] B [SEP] C [SEP] D [SEP]
     def _collate(self, batch):
-        pass
+        x0 = batch.pop(0)
+        batch = [x0] + [x[1:] for x in batch]
+        batch = torch.cat(batch, dim=0)[:self.max_tokens]
+        return batch, torch.ones_like(batch, dtype=torch.bool)
