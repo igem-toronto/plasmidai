@@ -15,7 +15,7 @@ class LitLLM(pl.LightningModule):
 
     def __init__(
         self,
-        tokenizer: str,
+        tokenizer_path: str,
         hidden_features: int = 512,
         num_layers: int = 22,
         norm: Literal["rms", "layer"] = "layer",
@@ -37,7 +37,7 @@ class LitLLM(pl.LightningModule):
 
         self.save_hyperparameters()
 
-        self.tokenizer = DNATokenizer(tokenizer)
+        self.tokenizer = DNATokenizer(tokenizer_path)
         self.mamba = MambaLMHeadModel(
             config=MambaConfig(
                 d_model=hidden_features,
