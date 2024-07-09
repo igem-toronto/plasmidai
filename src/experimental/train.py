@@ -3,7 +3,6 @@ from typing import Literal, Optional
 import jsonargparse
 import lightning.pytorch as pl
 
-from src.datasets.plasmid import PlasmidDataModule
 from src.experimental.callbacks import GradNormMonitor
 from src.experimental.lit import LitLLM
 from src.paths import LOG_DIR, random_checkpoint_dir
@@ -83,7 +82,7 @@ def train():
 
     # Populate arguments
     parser.add_function_arguments(configure_torch_backends, "backend")
-    parser.add_class_arguments(PlasmidDataModule, "data")
+    parser.add_subclass_arguments(pl.LightningDataModule, "data")
     parser.add_class_arguments(LitLLM, "lit")
     parser.add_class_arguments(SimpleTrainer, "trainer")
     parser.add_argument("--resume_path", type=Optional[str], default=None)
