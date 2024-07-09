@@ -139,5 +139,4 @@ class LitLLM(pl.LightningModule):
             repetition_penalty=hp.repetition_penalty,
             vocab_size=len(self.tokenizer),
         )
-        samples = samples[..., 1:]  # remove prompt
         return [self.tokenizer.decode_dna(x) for x in samples]
