@@ -89,7 +89,7 @@ def train():
     parser.add_argument("--finetune_path", type=Optional[str], default=None)
 
     # Argument linking
-    parser.link_arguments("data.tokenizer_path", "lit.tokenizer_path", apply_on="parse")
+    parser.link_arguments("data.tokenizer_path", "lit.tokenizer_path", apply_on="instantiate")
 
     # Parse
     cfg = parser.parse_args()
