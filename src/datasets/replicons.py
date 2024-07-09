@@ -84,4 +84,5 @@ class RepliconDataModule(pl.LightningDataModule):
         x0 = batch.pop(0)
         batch = [x0] + [x[1:] for x in batch]
         batch = torch.cat(batch, dim=0)[:self.max_tokens]
+        batch = batch.squeeze(0)  # (1 L C)
         return batch, torch.ones_like(batch, dtype=torch.bool)
