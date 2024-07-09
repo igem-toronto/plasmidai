@@ -37,7 +37,7 @@ class SimpleTrainer(pl.Trainer):
                     dirpath=checkpoint_dir,
                     filename="epoch={epoch}-loss={val/loss_finetune:.3f}",
                     auto_insert_metric_name=False,
-                    monitor="val/loss_finetune",
+                    monitor="val/loss",
                     mode="min",
                     save_top_k=1,
                     save_last=True,
