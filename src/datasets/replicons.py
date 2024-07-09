@@ -36,14 +36,15 @@ class RepliconDataModule(pl.LightningDataModule):
 
     def __init__(
         self,
-        tokenizer: str = str(DATA_ROOT / "tokenizers" / "tokenizer_nt.json"),
+        tokenizer_path: str = str(DATA_ROOT / "tokenizers" / "tokenizer_nt.json"),
         max_tokens: int = (2048 * 64),
         batch_size: int = 10,
         num_workers: int = 0,
     ):
         super().__init__()
 
-        self.tokenizer = DNATokenizer(tokenizer)
+        self.tokenizer_path = tokenizer_path
+        self.tokenizer = DNATokenizer(self.tokenizer_path)
         self.max_tokens = max_tokens
         self.batch_size = batch_size
         self.num_workers = num_workers
