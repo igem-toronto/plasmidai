@@ -4,7 +4,7 @@
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=64GB
-#SBATCH --time=1-12:00
+#SBATCH --time=0-16:00
 #SBATCH --output=logs/%N-%j.out
 
 export REPO_ROOT=~/projects/def-mikeuoft/alstonlo/code/plasmid-lm
