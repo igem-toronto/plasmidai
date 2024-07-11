@@ -25,7 +25,8 @@ srun python -m src.experimental.train \
     --backend.matmul_precision=medium \
     --data RepliconDataModule --data.max_tokens=262144 --data.batch_size=160 --data.num_workers=8 \
     --lit.hidden_features=256 --lit.num_layers=20 \
-    --lit.fused_add_norm=true --lit.scheduler_span=20000 --lit.num_samples_per_epoch=20 --lit.top_p=0.9 \
+    --lit.norm=rms --lit.fused_add_norm=true --lit.scheduler_span=50000 \
+    --lit.num_samples_per_epoch=20 --lit.top_p=0.9 \
     --trainer.accelerator=gpu  --trainer.devices=1 --trainer.precision=bf16-mixed \
     --trainer.wandb=true --trainer.wandb_project=train_replicon_llm --trainer.wandb_dir="${REPO_ROOT}/logs" \
     --trainer.checkpoint=true --trainer.checkpoint_dir="${REPO_ROOT}/checkpoints/$(date +'%Y-%m-%d-%H-%M')" \
