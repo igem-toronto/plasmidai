@@ -59,10 +59,10 @@ class LitLLM(pl.LightningModule):
         T = hp.scheduler_span
         warmup = int(0.1 * T)
 
-        if hp.scheduler_span == "flat":
-            return hp.lr
-        elif step <= warmup:
+        if step <= warmup:
             return max_lr * (step / warmup)
+        elif hp.scheduler_span == "flat":
+            return hp.lr
         elif warmup < step <= T:
             scale = 1 + math.cos(math.pi * ((step - warmup) / (T - warmup)))
             return min_lr + 0.5 * (max_lr - min_lr) * scale
