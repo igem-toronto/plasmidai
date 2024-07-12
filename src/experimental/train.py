@@ -104,7 +104,7 @@ def train():
 
     # Start training
     for logger in init.trainer.loggers:
-        logger.log_hyperparams(cfg)
+        logger.log_hyperparams(cfg.as_dict())
     init.trainer.fit(model=init.lit, datamodule=init.data, ckpt_path=cfg.resume_path)
 
 

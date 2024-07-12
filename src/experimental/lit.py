@@ -35,7 +35,7 @@ class LitLLM(pl.LightningModule):
     ):
         super().__init__()
 
-        self.save_hyperparameters()
+        self.save_hyperparameters(logger=False)
 
         self.tokenizer = DNATokenizer(tokenizer_path)
         self.mamba = MambaLMHeadModel(
