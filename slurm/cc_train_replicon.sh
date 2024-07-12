@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --nodes 1
-#SBATCH --gres=gpu:1
-#SBATCH --tasks-per-node=1
-#SBATCH --cpus-per-task=10
+#SBATCH --gres=gpu:2
+#SBATCH --tasks-per-node=2
+#SBATCH --cpus-per-task=6
 #SBATCH --mem=64GB
-#SBATCH --time=0-13:00
+#SBATCH --time=0-15:00
 #SBATCH --output=logs/%N-%j.out
 
 export PROJECT=~/projects/def-mikeuoft/alstonlo
@@ -23,11 +23,10 @@ export TORCH_NCCL_BLOCKING_WAIT=1
 
 srun python -m src.experimental.train \
     --backend.matmul_precision=medium \
-    --data RepliconDataModule --data.max_tokens=262144 --data.batch_size=160 --data.num_workers=8 \
-    --lit.hidden_features=256 --lit.num_layers=20 \
-    --lit.norm=rms --lit.fused_add_norm=true --lit.scheduler_shape=flat --lit.scheduler_span=50000 \
+    --data RepliconDataModule --data.max_tokens=131072 --data.batch_size=80 --data.num_workers=4 \
+    --lit.fused_add_norm=true --lit.scheduler_span=50000 \
     --lit.num_samples_per_epoch=20 --lit.top_p=0.9 \
-    --trainer.accelerator=gpu  --trainer.devices=1 --trainer.precision=bf16-mixed \
+    --trainer.accelerator=gpu --trainer.devices=2 --trainer.precision=bf16-mixed \
     --trainer.wandb=true --trainer.wandb_project=train_replicon_llm --trainer.wandb_dir="${REPO_ROOT}/logs" \
     --trainer.checkpoint=true --trainer.checkpoint_dir="${REPO_ROOT}/checkpoints/$(date +'%Y-%m-%d-%H-%M')" \
     --trainer.progress_bar=true \
