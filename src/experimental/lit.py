@@ -18,7 +18,7 @@ class LitLLM(pl.LightningModule):
         tokenizer_path: str,
         hidden_features: int = 512,
         num_layers: int = 22,
-        d_state: int = 64,
+        ssm_cfg: dict = {'layer': 'Mamba2', 'd_state': 64},
         norm: Literal["rms", "layer"] = "layer",
         fused_add_norm: bool = False,
         lr: float = 4e-3,
@@ -43,7 +43,7 @@ class LitLLM(pl.LightningModule):
             config=MambaConfig(
                 d_model=hidden_features,
                 n_layer=num_layers,
-                d_state=d_state,
+                ssm_cfg=ssm_cfg,
                 vocab_size=len(self.tokenizer),
                 rms_norm=(norm == "rms"),
                 residual_in_fp32=True,
