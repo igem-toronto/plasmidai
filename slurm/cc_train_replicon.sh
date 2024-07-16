@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=6
 #SBATCH --mem=64GB
 #SBATCH --time=0-15:00
-#SBATCH --output=logs/%N-%j.out
+#SBATCH --output=%N-%j.out
 
 export PROJECT=/lustre07/scratch/adibvafa
 export REPO_ROOT=$PROJECT/plasmid-lm
