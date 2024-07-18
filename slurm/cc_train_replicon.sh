@@ -6,6 +6,7 @@
 #SBATCH --mem=64GB
 #SBATCH --time=0-15:00
 #SBATCH --output=%N-%j.out
+#SBATCH --error=%N-%j.err
 
 export PROJECT=/lustre07/scratch/adibvafa
 export REPO_ROOT=$PROJECT/plasmid-lm
