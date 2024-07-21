@@ -15,8 +15,8 @@ cd $REPO_ROOT
 module load StdEnv/2023 python/3.11 scipy-stack
 virtualenv --no-download $SLURM_TMPDIR/env
 source $SLURM_TMPDIR/env/bin/activate
-pip install --no-index "torch<2.3" lightning wandb einops scipy pandas biopython transformers jsonargparse
 pip install -U mamba_ssm=='2.1.0' causal_conv1d=='1.3.0.post1'
+pip install --no-index "torch<2.3" lightning wandb einops scipy pandas biopython transformers jsonargparse
 
 wandb offline
 
