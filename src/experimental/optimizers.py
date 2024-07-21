@@ -4,8 +4,9 @@ import torch
 import torch.nn as nn
 
 try:
-    from mamba_ssm.ops.triton.layernorm import RMSNorm
+    from mamba_ssm.ops.triton.layer_norm import RMSNorm
 except ImportError:
+    print("RMSNorm not available.")
     RMSNorm = None
 
 
