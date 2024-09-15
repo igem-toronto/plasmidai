@@ -1,0 +1,96 @@
+model_name: EvoPlasmid
+
+root: '/home/xinleilin/Projects/IGEM/plasmid-ai'
+tokenizer: 'dna_bpe_tokenizer_offset'
+seed: 42
+
+model_type: EvoFineTune
+
+# full_debug mode will enable a lot of information being printed
+full_debug: False 
+
+# evo
+evo_freeze: True
+evo_input_embed_dim: 512
+evo_input_length: 4096
+evo_output_features: 4096
+unfreeze_index: 407 # block 30 and 31 wil; be trained
+#393 # block 29 and more
+use_custom_tokens: False
+# number of hidden layers for the patch embedding
+num_hidden_patch_embed: 3
+hidden_dim_patch_embed: 512
+
+# architecture mamba
+embed_channels: 192 # number of channels after the tiny mamba layers.
+num_mamba_blocks: 6
+
+# final regressor:
+mamba_outputs: 192
+num_hidden_layers: 3
+hidden_dim: 512
+num_tokens: 4096
+dropout: 0.25
+
+# training
+epoch_number: 1 # just for testing lmao
+# batch_size: 16
+# batch_size: 8
+batch_size: 1 # just to see how scalable it is
+# learning_rate: 0.001
+#scheduler:
+scheduler: True
+learning_rate: 0.00005
+scheduler_fct: cosine
+# for cosine
+T_0: 10
+T_mult: 2 # doubling the spacing bewteen each reset
+eta_min: 0.0000005 #the minimum learning rate
+# for RRLP
+scheduler_factor: 0.1
+start_epoch: 1
+
+loss_type: {'crossentropy': 1.0}
+
+# optimizer:
+optimizer: 'adamW'
+weight_decay: 0.1 # value found in VideoMamba
+
+max_grad_norm: 1.0 # use something negative to not have it
+
+# device settings
+  # (should be changed depending on the model)
+num_cpus: 1
+num_gpus: 1
+parallelize: False
+
+# checkpoints
+checkpoint_directory: checkpoints/
+# checkpoint_name: 'Custom_Tanh_normalized_checkpoints'
+checkpoint_name: 'base_evo_model'
+# checkpoint_name: 'testing_false_dataset'
+
+# Follow up on the training of another previous run?
+follow_up: False
+
+  # if yes
+previous_training_epoch: 1
+previous_checkpoint: ''
+
+# data
+real_job: False
+dataset_name: 'Plasmids Fasta'
+data_path: /home/xinleilin/Projects/IGEM/plasmid-ai/data/plasmids.fasta
+splits_file: /home/xinleilin/Projects/IGEM/plasmid-ai/data/splits.csv
+evo_weights_path: /home/xinleilin/Projects/IGEM/plasmid-ai/src/experimental/evo-fine-tune/checkpoints/evo-1-8k-base/evo-1-8k-base.pth
+# I will make the length of the initial input lower, so I can loop through the 10 000 max length
+length_seq: 100
+max_length: 10000
+
+wandb_grad_log_interval: 20
+
+# cloning the evo repo for offline testing
+evo_model_path: /home/xinleilin/Projects/IGEM/evo-1-8k-base
+evo_config_path: /home/xinleilin/Projects/evo/evo/configs/evo-1-8k-base_inference.yml
+
+

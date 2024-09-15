@@ -166,3 +166,6 @@ data/tmp
 data/*.npz
 sandbox
 checkpoints
+
+outputs/
+wandb/
