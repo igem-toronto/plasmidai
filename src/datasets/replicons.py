@@ -60,13 +60,13 @@ class RepliconDataModule(pl.LightningDataModule):
             self.datasets[split] = RepliconDataset(examples, self.tokenizer)
 
     def train_dataloader(self):
-        return self._loader(split="train")
+        return self._loader(split="train", shuffle=True, drop_last=True)
 
     def val_dataloader(self):
-        return self._loader(split="val")
+        return self._loader(split="val", shuffle=False, drop_last=False)
 
     def test_dataloader(self):
-        return self._loader(split="test")
+        return self._loader(split="test", shuffle=False, drop_last=False)
 
     def _loader(self, split, shuffle=True, drop_last=True):
         return DataLoader(
