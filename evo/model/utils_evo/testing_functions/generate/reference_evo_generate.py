@@ -13,15 +13,16 @@ def generate(
     model: StripedHyena,
     tokenizer: CharLevelTokenizer,
     n_tokens: int = 100,
-    temperature: float = 0.,
+    temperature: float = 0.0,
     top_k: int = 1,
-    top_p: float = 1.,
+    top_p: float = 1.0,
     batched: bool = True,
     prepend_bos: bool = True,
     cached_generation: bool = False,
     verbose: int = 1,
-    device: str = 'cuda:0',
-    *args, **kwargs,
+    device: str = "cuda:0",
+    *args,
+    **kwargs,
 ) -> Tuple[List[str], List[float]]:
     """
     Performs generation from a list of prompts.
@@ -52,11 +53,11 @@ def generate(
     else:
         if verbose:
             if not uniform_lengths:
-                sys.stderr.write('Note: Prompts are of different lengths.\n')
-            sys.stderr.write('Note: Will not do batched generation.\n')
+                sys.stderr.write("Note: Prompts are of different lengths.\n")
+            sys.stderr.write("Note: Will not do batched generation.\n")
         input_ids_list = [
             prepare_batch(
-                [ prompt_seq ],
+                [prompt_seq],
                 tokenizer,
                 prepend_bos=prepend_bos,
                 device=device,
@@ -67,7 +68,7 @@ def generate(
     generated_seqs, generated_scores = [], []
     for input_ids in input_ids_list:
         batch_size = input_ids.shape[0]
-        
+
         output_ids, logits = g.generate(
             input_ids=input_ids,
             num_tokens=n_tokens,
@@ -78,9 +79,9 @@ def generate(
             stop_at_eos=False,
         )
         if verbose > 1:
-            print('input_ids.shape', input_ids.shape)
-            print('output_ids.shape', output_ids.shape)
-            print('logits.shape', logits.shape)
+            print("input_ids.shape", input_ids.shape)
+            print("output_ids.shape", output_ids.shape)
+            print("logits.shape", logits.shape)
 
         generated_seqs_batch = list(tokenizer.detokenize_batch(output_ids))
         assert len(generated_seqs_batch) == batch_size
@@ -89,7 +90,7 @@ def generate(
         logprobs = logits_to_logprobs(logits, output_ids, trim_bos=prepend_bos)
         logprobs = logprobs.float().cpu().numpy()
 
-        generated_scores += [ np.mean(logprobs[idx]) for idx in range(batch_size) ]
+        generated_scores += [np.mean(logprobs[idx]) for idx in range(batch_size)]
 
     assert len(generated_seqs) == len(generated_scores) == len(prompt_seqs)
     if verbose:

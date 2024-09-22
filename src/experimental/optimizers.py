@@ -1,4 +1,4 @@
-from typing import Callable, List, Tuple, Dict, Any, Optional
+from typing import Callable, List, Tuple, Any, Optional
 import torch
 import torch.nn as nn
 from torch.optim import Optimizer
@@ -60,7 +60,8 @@ def build_optimizer_and_scheduler(
             {"params": params, "weight_decay": wd},
             {"params": params_no_wd, "weight_decay": 0.0},
         ],
-        lr=1.0, betas=betas,
+        lr=1.0,
+        betas=betas,
         **optim_kwargs,
     )
 

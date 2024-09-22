@@ -1,5 +1,3 @@
-from huggingface_hub import hf_hub_download
-
 # downloads file from hub
 # hf_hub_download(repo_id="togethercomputer/evo-1-8k-base", filename="config.json")
 

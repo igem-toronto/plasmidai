@@ -49,7 +49,7 @@ class PlasmidDataset(Dataset):
 
         # Tokenize
         sequence = self.tokenizer.tokenize_dna(dna, max_length=self.Lmax)
-        mask = (sequence != self.tokenizer.pad_token_id)
+        mask = sequence != self.tokenizer.pad_token_id
         return sequence, mask
 
 
@@ -70,7 +70,9 @@ class PlasmidDataModule(pl.LightningDataModule):
 
     def __init__(
         self,
-        tokenizer_path: str = str(DATA_ROOT / "tokenizers" / "dna_bpe_tokenizer_cutoff_rc.json"),
+        tokenizer_path: str = str(
+            DATA_ROOT / "tokenizers" / "dna_bpe_tokenizer_cutoff_rc.json"
+        ),
         Lmax: int = 2048,
         batch_size: int = 10,
         num_workers: int = 0,
@@ -104,7 +106,9 @@ class PlasmidDataModule(pl.LightningDataModule):
     def test_dataloader(self) -> DataLoader:
         return self._loader(split="test")
 
-    def _loader(self, split: str, shuffle: bool = True, drop_last: bool = True) -> DataLoader:
+    def _loader(
+        self, split: str, shuffle: bool = True, drop_last: bool = True
+    ) -> DataLoader:
         return DataLoader(
             dataset=self.datasets[split],
             batch_size=self.batch_size,

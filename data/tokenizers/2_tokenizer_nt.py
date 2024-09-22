@@ -37,5 +37,5 @@ def main() -> None:
     tokenizer.save(str(root / "tokenizer_nt.json"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

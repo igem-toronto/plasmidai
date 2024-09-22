@@ -1,6 +1,6 @@
 from Bio import SeqIO
 
-path = '/home/linxin67/scratch/IGEM_data/plasmids.fasta'
+path = "/home/linxin67/scratch/IGEM_data/plasmids.fasta"
 L = 1000
 # for r in SeqIO.parse(path, 'fasta'):
 #     print(r)

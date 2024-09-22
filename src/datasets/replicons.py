@@ -94,7 +94,9 @@ class RepliconDataModule(pl.LightningDataModule):
     def test_dataloader(self) -> DataLoader:
         return self._loader(split="test", shuffle=False, drop_last=False)
 
-    def _loader(self, split: str, shuffle: bool = True, drop_last: bool = True) -> DataLoader:
+    def _loader(
+        self, split: str, shuffle: bool = True, drop_last: bool = True
+    ) -> DataLoader:
         return DataLoader(
             dataset=self.datasets[split],
             batch_size=self.batch_size,
@@ -120,6 +122,6 @@ class RepliconDataModule(pl.LightningDataModule):
         """
         x0 = batch.pop(0)
         batch = [x0] + [x[1:] for x in batch]
-        batch = torch.cat(batch, dim=0)[:self.max_tokens]
+        batch = torch.cat(batch, dim=0)[: self.max_tokens]
         batch = batch.unsqueeze(0)  # (1 L C)
         return batch, torch.ones_like(batch, dtype=torch.bool)

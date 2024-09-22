@@ -1,25 +1,26 @@
-'''
+"""
 Implementation from the mamba blocks to all the possible tokens for classification
-'''
+"""
 import torch.nn as nn
-import torch 
+import torch
+
 
 class TokenRegressor(nn.Module):
-    '''Final regressor from mamba blocks to tokens
-    '''
+    """Final regressor from mamba blocks to tokens"""
+
     def __init__(self, config):
         super().__init__()
         self.config = config
-        self.input_dim = self.config['mamba_outputs']
-        self.output_dim = self.config['num_tokens']
-        self.hidden_dim = self.config['hidden_dim']
-        self.num_hidden_layers = self.config['num_hidden_layers']
-        self.dropout = self.config['dropout']
-        if self.dropout > 0.:
-            self.dropout_layer = torch.nn.Dropout(p=self.dropout) 
+        self.input_dim = self.config["mamba_outputs"]
+        self.output_dim = self.config["num_tokens"]
+        self.hidden_dim = self.config["hidden_dim"]
+        self.num_hidden_layers = self.config["num_hidden_layers"]
+        self.dropout = self.config["dropout"]
+        if self.dropout > 0.0:
+            self.dropout_layer = torch.nn.Dropout(p=self.dropout)
 
         self.regressor = self.create_model()
- 
+
     def create_model(self):
         layers = []
         layers.append(nn.Linear(self.input_dim, self.hidden_dim))
@@ -36,5 +37,3 @@ class TokenRegressor(nn.Module):
     def forward(self, x):
         x = self.regressor(x)
         return x
-
-

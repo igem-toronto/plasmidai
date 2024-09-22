@@ -69,7 +69,7 @@ def sample_loop(
         project=wandb_project,
         entity=wandb_entity,
         dir=wandb_dir,
-        config=dict(**sample_kwargs, precision=precision)
+        config=dict(**sample_kwargs, precision=precision),
     )
     wandb.log({"samples": table})
     wandb.finish()

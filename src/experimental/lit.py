@@ -1,5 +1,5 @@
 import math
-from typing import List, Literal, Dict, Any, Optional
+from typing import List, Literal, Dict, Any
 
 import lightning.pytorch as pl
 import torch
@@ -21,7 +21,7 @@ class LitLLM(pl.LightningModule):
         tokenizer_path: str,
         hidden_features: int = 512,
         num_layers: int = 22,
-        ssm_cfg: Dict[str, Any] = {'layer': 'Mamba2', 'd_state': 64},
+        ssm_cfg: Dict[str, Any] = {"layer": "Mamba2", "d_state": 64},
         norm: Literal["rms", "layer"] = "layer",
         fused_add_norm: bool = False,
         lr: float = 4e-3,
@@ -203,7 +203,9 @@ class LitLLM(pl.LightningModule):
         loss = losses.sum() / num_tokens.float()
 
         # Logging
-        self.log(f"{split}/loss", loss, batch_size=num_tokens, sync_dist=(split != "train"))
+        self.log(
+            f"{split}/loss", loss, batch_size=num_tokens, sync_dist=(split != "train")
+        )
 
         return loss
 

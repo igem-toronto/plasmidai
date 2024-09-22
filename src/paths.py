@@ -1,6 +1,5 @@
 import pathlib
 import uuid
-from typing import Union
 
 # Define constant paths
 CODE_ROOT: pathlib.Path = pathlib.Path(__file__).parent

@@ -2,28 +2,32 @@ import torch
 from evo import Evo
 
 # Initialize the device
-device = 'cuda:0'
+device = "cuda:0"
 
 # Load the model and tokenizer
-evo_model = Evo('evo-1-131k-base')
+evo_model = Evo("evo-1-131k-base")
 model, tokenizer = evo_model.model, evo_model.tokenizer
 model.to(device)
 model.eval()
 
 # Define the sequence and convert it to input ids
-sequence = 'ACGTAI'
-input_ids = torch.tensor(
-    tokenizer.tokenize(sequence),
-    dtype=torch.int,
-).to(device).unsqueeze(0)
+sequence = "ACGTAI"
+input_ids = (
+    torch.tensor(
+        tokenizer.tokenize(sequence),
+        dtype=torch.int,
+    )
+    .to(device)
+    .unsqueeze(0)
+)
 output = model(input_ids)  # (batch, length, vocab)
 print(type(output))
 logits, _ = output
 # Print the logits and their shape
-print('Logits: ', logits)
+print("Logits: ", logits)
 
 # B C L
-print('Shape (batch, length, vocab): ', logits.shape)
+print("Shape (batch, length, vocab): ", logits.shape)
 
 # # Print the model's layers and their weights
 # print("Model's layers and weights:")
@@ -51,13 +55,14 @@ print('Shape (batch, length, vocab): ', logits.shape)
 
 # # Print the evo_model (or its structure)
 print(model)
-print(type(model)) # this tells me the model is a class, that the class is StripedHyena... does that mean I can change the attributes of the class, notably change the forwrad functino
+print(
+    type(model)
+)  # this tells me the model is a class, that the class is StripedHyena... does that mean I can change the attributes of the class, notably change the forwrad functino
 # print(model[-1])
 # print(type(model[-1]))
-print(vars(model)) # returns all the attributes of a mdoel
+print(vars(model))  # returns all the attributes of a mdoel
 
 # model.
 # maybe try this:
 # https://discuss.pytorch.org/t/how-to-replace-a-layer-or-module-in-a-pretrained-network/60068
 print(model.__dict__)
-

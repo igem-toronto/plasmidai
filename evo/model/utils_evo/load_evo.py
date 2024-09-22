@@ -1,4 +1,3 @@
-import pkgutil
 from transformers import AutoConfig, AutoModelForCausalLM
 import yaml
 
@@ -7,10 +6,17 @@ from stripedhyena.model import StripedHyena
 from stripedhyena.tokenizer import CharLevelTokenizer
 
 
-MODEL_NAMES = ['evo-1-8k-base', 'evo-1-131k-base']
+MODEL_NAMES = ["evo-1-8k-base", "evo-1-131k-base"]
+
 
 class Evo:
-    def __init__(self, model_name: str = MODEL_NAMES[1], device: str = None, config_path='Error', model_path='Error'):
+    def __init__(
+        self,
+        model_name: str = MODEL_NAMES[1],
+        device: str = None,
+        config_path="Error",
+        model_path="Error",
+    ):
         """
         Loads an Evo model checkpoint given a model name.
         If the checkpoint does not exist, we automatically download it from HuggingFace.
@@ -21,20 +27,20 @@ class Evo:
 
         if model_name not in MODEL_NAMES:
             raise ValueError(
-                f'Invalid model name {model_name}. Should be one of: '
+                f"Invalid model name {model_name}. Should be one of: "
                 f'{", ".join(MODEL_NAMES)}.'
             )
 
         # Assign config path.
 
-        if model_name == 'evo-1-8k-base':
+        if model_name == "evo-1-8k-base":
             # config_path = 'configs/evo-1-8k-base_inference.yml'
             config_path = config_path
-        elif model_name == 'evo-1-131k-base':
-            config_path = 'configs/evo-1-131k-base_inference.yml'
+        elif model_name == "evo-1-131k-base":
+            config_path = "configs/evo-1-131k-base_inference.yml"
         else:
             raise ValueError(
-                f'Invalid model name {model_name}. Should be one of: '
+                f"Invalid model name {model_name}. Should be one of: "
                 f'{", ".join(MODEL_NAMES)}.'
             )
 
@@ -51,33 +57,33 @@ class Evo:
 
         self.tokenizer = CharLevelTokenizer(512)
 
-        
+
 HF_MODEL_NAME_MAP = {
-    'evo-1-8k-base': 'togethercomputer/evo-1-8k-base',
-    'evo-1-131k-base': 'togethercomputer/evo-1-131k-base',
+    "evo-1-8k-base": "togethercomputer/evo-1-8k-base",
+    "evo-1-131k-base": "togethercomputer/evo-1-131k-base",
 }
+
 
 def load_checkpoint(
     model_name: str = MODEL_NAMES[1],
-    config_path: str = 'evo/configs/evo-1-131k-base_inference.yml',
+    config_path: str = "evo/configs/evo-1-131k-base_inference.yml",
     device: str = None,
     model_path: str = None,
-    *args, **kwargs
+    *args,
+    **kwargs,
 ):
     """
     Load checkpoint from HuggingFace and place it into SH model.
     """
 
     # Map model name to HuggingFace model name.
-
     hf_model_name = HF_MODEL_NAME_MAP[model_name]
 
     # Load model config.
-
     model_config = AutoConfig.from_pretrained(
         model_path,
         # hf_model_name,
-        trust_remote_code=True, # allow custom_code
+        trust_remote_code=True,  # allow custom_code
         local_files_only=True,
         # revision='1.1_fix',
     )
@@ -106,10 +112,9 @@ def load_checkpoint(
     # global_config = dotdict(config, Loader=yaml.FullLoader)
 
     # Load SH config from absolute path
-    with open(config_path, 'r') as file:
+    with open(config_path, "r") as file:
         config = yaml.safe_load(file)
     global_config = dotdict(config, Loader=yaml.FullLoader)
-
 
     # Load SH Model.
 

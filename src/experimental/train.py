@@ -1,4 +1,4 @@
-from typing import Literal, Optional, List
+from typing import Literal, Optional, List, Union
 
 import jsonargparse
 import lightning.pytorch as pl
@@ -81,10 +81,12 @@ class SimpleTrainer(pl.Trainer):
                 log_model=False,
                 save_dir=wandb_dir,
             )
-            callbacks.extend([
-                pl.callbacks.LearningRateMonitor(),
-                GradNormMonitor(),
-            ])
+            callbacks.extend(
+                [
+                    pl.callbacks.LearningRateMonitor(),
+                    GradNormMonitor(),
+                ]
+            )
 
         super().__init__(
             accelerator=accelerator,
@@ -122,7 +124,9 @@ def train() -> None:
     parser.add_argument("--finetune_path", type=Optional[str], default=None)
 
     # Argument linking
-    parser.link_arguments("data.tokenizer_path", "lit.tokenizer_path", apply_on="instantiate")
+    parser.link_arguments(
+        "data.tokenizer_path", "lit.tokenizer_path", apply_on="instantiate"
+    )
 
     # Parse
     cfg = parser.parse_args()

@@ -1,5 +1,5 @@
 import collections
-from typing import Dict, List, DefaultDict
+from typing import Dict, List, DefaultDict, Union
 
 import jsonargparse
 import numpy as np
@@ -8,6 +8,7 @@ from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 
 SEED: int = 23
+
 
 def will_finetune(r: SeqRecord, path: str) -> bool:
     """
@@ -30,6 +31,7 @@ def will_finetune(r: SeqRecord, path: str) -> bool:
         return False
     else:
         raise ValueError("Path must contain 'plasmids' or 'replicons'")
+
 
 def split_indices(n: int) -> DefaultDict[str, List[int]]:
     """
@@ -59,6 +61,7 @@ def split_indices(n: int) -> DefaultDict[str, List[int]]:
 
     return indices
 
+
 def partition(path: str, clusters: str, out: str) -> None:
     """
     Partition sequences into train, validation, and test sets based on cluster information.
@@ -76,7 +79,9 @@ def partition(path: str, clusters: str, out: str) -> None:
 
     records: Dict[str, SeqRecord] = {r.id: r for r in SeqIO.parse(path, "fasta")}
     singletons: set = set(records) - set(df["id"].unique())
-    singletons_df: pd.DataFrame = pd.DataFrame([[i, i] for i in singletons], columns=columns)
+    singletons_df: pd.DataFrame = pd.DataFrame(
+        [[i, i] for i in singletons], columns=columns
+    )
     df = pd.concat([df, singletons_df])
 
     df["n"] = 1
@@ -96,9 +101,12 @@ def partition(path: str, clusters: str, out: str) -> None:
 
     assert len(assgn) == len(records)
     assgn_df: pd.DataFrame = pd.DataFrame(list(assgn.values()))
-    assgn_df["finetune"] = assgn_df["id"].apply(lambda k: will_finetune(records[k], path))
+    assgn_df["finetune"] = assgn_df["id"].apply(
+        lambda k: will_finetune(records[k], path)
+    )
     assgn_df = assgn_df.sort_values(by="id").set_index("id")
     assgn_df.to_csv(out)
+
 
 if __name__ == "__main__":
     parser = jsonargparse.ArgumentParser()

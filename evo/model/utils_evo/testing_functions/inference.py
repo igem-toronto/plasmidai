@@ -1,7 +1,4 @@
-from generate import reference_evo_generate
-
-
-#~ use what is provided by evo already
+# ~ use what is provided by evo already
 # def generate_sequences(model, start_sequence, tokenizer, max_length=100, num_sequences=10):
 #     model.eval()
 #     sequences = []

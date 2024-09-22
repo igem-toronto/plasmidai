@@ -3,6 +3,7 @@ from typing import List
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 
+
 def filter_below_length(path: str, L: int) -> None:
     """
     Filter FASTA sequences below a specified length and write them to a new file.
@@ -32,9 +33,18 @@ def filter_below_length(path: str, L: int) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Filter FASTA sequences below a specified length.")
-    parser.add_argument("--path", type=str, required=True, help="Path to the input FASTA file")
-    parser.add_argument("--L", type=int, default=15000, help="Length threshold for filtering (default: 15000)")
+    parser = argparse.ArgumentParser(
+        description="Filter FASTA sequences below a specified length."
+    )
+    parser.add_argument(
+        "--path", type=str, required=True, help="Path to the input FASTA file"
+    )
+    parser.add_argument(
+        "--L",
+        type=int,
+        default=15000,
+        help="Length threshold for filtering (default: 15000)",
+    )
     args = parser.parse_args()
 
     filter_below_length(**vars(args))

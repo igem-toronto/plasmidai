@@ -44,8 +44,10 @@ def random_circular_crop(dna: str, L: int) -> str:
     """
     start: int = torch.randint(len(dna), size=[1]).item()
     L = min(len(dna), L)
-    crop: str = dna[start:(start + L)]
+    crop: str = dna[start : (start + L)]
     overhang: int = L - len(crop)  # wrap around to start
     crop = crop + dna[:overhang]
-    assert len(crop) == L, f"Cropped sequence length {len(crop)} doesn't match desired length {L}"
+    assert (
+        len(crop) == L
+    ), f"Cropped sequence length {len(crop)} doesn't match desired length {L}"
     return crop
