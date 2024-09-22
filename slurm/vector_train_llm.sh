@@ -11,10 +11,14 @@
 #SBATCH --export=ALL
 #SBATCH --output=logs/slurm-%j.out
 
-source ~/.bashrc
-conda activate plasmid-lm
+# Source your bash configuration
+source # <PATH_TO_YOUR_BASHRC>
 
-cd ..
+# Activate your conda environment
+conda activate # <YOUR_CONDA_ENVIRONMENT_NAME>
+
+# Change to the parent directory of your project
+cd # <PATH_TO_PARENT_DIRECTORY>
 
 srun python -m src.experimental.llm.train \
   --accelerator=gpu \

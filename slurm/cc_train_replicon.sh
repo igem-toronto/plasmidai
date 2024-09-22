@@ -8,11 +8,14 @@
 #SBATCH --output=%N-%j.out
 #SBATCH --error=%N-%j.err
 
-export PROJECT=/lustre07/scratch/adibvafa
-export REPO_ROOT=$PROJECT/plasmid-lm
+# Add your project directory path here
+export PROJECT=# <YOUR_PROJECT_DIRECTORY>
+# Add the path to your repository root
+export REPO_ROOT=# <YOUR_REPO_ROOT_PATH>
 cd $REPO_ROOT
 
-source ~/mamba/bin/activate
+# Add the path to your conda/mamba environment
+source # <PATH_TO_YOUR_MAMBA_OR_CONDA>/bin/activate
 
 wandb offline
 
