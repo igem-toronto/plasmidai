@@ -1,0 +1,18 @@
+name: plasmid-lm
+channels:
+  - conda-forge
+  - pytorch
+  - bioconda
+dependencies:
+  - python=3.9
+  - pytorch=2.2
+  - lightning
+  - wandb
+  - einops
+  - scipy
+  - gdown
+  - pandas
+  - biopython
+  - jsonargparse
+  - transformers
+  - pip

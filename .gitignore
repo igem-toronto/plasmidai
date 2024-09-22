@@ -1,0 +1,210 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+#   For a library or package, you might want to ignore these files since the code is
+#   intended to run in multiple environments; otherwise, check them in:
+# .python-version
+
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
+# poetry
+#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
+#   This is especially recommended for binary packages to ensure reproducibility, and is more
+#   commonly ignored for libraries.
+#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
+#poetry.lock
+
+# pdm
+#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
+#pdm.lock
+#   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
+#   in version control.
+#   https://pdm.fming.dev/#use-with-ide
+.pdm.toml
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# PyCharm
+#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
+#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
+#  and can be added to the global gitignore or merged into this file.  For a more nuclear
+#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
+.idea/
+.DS_Store
+
+data/**/*.fasta
+data/**/*.tsv
+data/tmp
+data/*.npz
+sandbox
+checkpoints
+
+outputs/
+wandb//8a74b05bb623c592f8014827fe16059ca9ec526137519570 src/validadtion/batch-wide_analysis/generated_sequences/sequences_may/samples-08-00-31-05-2024.fasta
+/5b89bb245c82e56a4b504423617e58de359939ea36908474 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_may/chromosome.fasta
+/54a6b822c98d4afee6b994bcd1b946c638ade0c935255023 src/validadtion/batch-wide_analysis/generated_sequences/sequences_mar/samples_llm_mar17.fasta
+/aa9412a895a215b6d00c8e06d14ae5c422455cee34684322 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_mar/chromosome.fasta
+/9bf41c19d9c00cfb3c21ff4e476ff3527e0cedaf22083658 src/validadtion/batch-wide_analysis/generated_sequences/sequences_july/wandb_export_2024-07-11T17_35_51.fasta
+/d249834520671d6b0777beea2cd85263af82fa0922053664 src/validadtion/plasmid_classification/new_seqs_2024-07-26.fasta
+/bd516992aa946eb2c158dad061f5df6de89fede421954778 src/validadtion/batch-wide_analysis/generated_sequences/sequences_july/wandb_export_2024-07-11T17_35_51.550-04_00.csv
+/da6500c990c16ef43effd47f0b16d37fb6f45a6a21717557 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_july/chromosome.fasta
+/cd85b6bcc121aa9c081f8fefe885f14c41edea2220628730 src/validadtion/batch-wide_analysis/generated_sequences/sequences_sep/finetune_2024-09-07-10-59_samples.fasta
+/4137ebbff62177140f3e57df55bcbc2ddebcf35120529875 src/validadtion/batch-wide_analysis/generated_sequences/sequences_sep/finetune_2024-09-07-10-59_samples.json
+/a88df7cf5d522bd72ba0ec1a1411ad98645d42a119314698 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_sep/chromosome.fasta
+/55335ffbd7bd939593eba327668882d520ece1dc17460557 src/validadtion/batch-wide_analysis/generated_sequences/sequences_jul_pretrain/pretrain_2024-07-22-16-18_samples.fasta
+/1ec6378d898426e9e8aae819616a2521ec81e1c817361702 src/validadtion/batch-wide_analysis/generated_sequences/sequences_jul_pretrain/pretrain_2024-07-22-16-18_samples.json
+37519570 src/validadtion/batch-wide_analysis/generated_sequences/sequences_may/samples-08-00-31-05-2024.fasta
+36908474 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_may/chromosome.fasta
+35255023 src/validadtion/batch-wide_analysis/generated_sequences/sequences_mar/samples_llm_mar17.fasta
+34684322 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_mar/chromosome.fasta
+22083658 src/validadtion/batch-wide_analysis/generated_sequences/sequences_july/wandb_export_2024-07-11T17_35_51.fasta
+22053664 src/validadtion/plasmid_classification/new_seqs_2024-07-26.fasta
+21954778 src/validadtion/batch-wide_analysis/generated_sequences/sequences_july/wandb_export_2024-07-11T17_35_51.550-04_00.csv
+21717557 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_july/chromosome.fasta
+20628730 src/validadtion/batch-wide_analysis/generated_sequences/sequences_sep/finetune_2024-09-07-10-59_samples.fasta
+20529875 src/validadtion/batch-wide_analysis/generated_sequences/sequences_sep/finetune_2024-09-07-10-59_samples.json
+19314698 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_sep/chromosome.fasta
+17460557 src/validadtion/batch-wide_analysis/generated_sequences/sequences_jul_pretrain/pretrain_2024-07-22-16-18_samples.fasta
+17361702 src/validadtion/batch-wide_analysis/generated_sequences/sequences_jul_pretrain/pretrain_2024-07-22-16-18_samples.json
+src/validadtion/batch-wide_analysis/generated_sequences/sequences_may/samples-08-00-31-05-2024.fasta
+src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_may/chromosome.fasta
+src/validadtion/batch-wide_analysis/generated_sequences/sequences_mar/samples_llm_mar17.fasta
+src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_mar/chromosome.fasta
+src/validadtion/batch-wide_analysis/generated_sequences/sequences_july/wandb_export_2024-07-11T17_35_51.fasta
+src/validadtion/plasmid_classification/new_seqs_2024-07-26.fasta
+src/validadtion/batch-wide_analysis/generated_sequences/sequences_july/wandb_export_2024-07-11T17_35_51.550-04_00.csv
+src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_july/chromosome.fasta
+src/validadtion/batch-wide_analysis/generated_sequences/sequences_sep/finetune_2024-09-07-10-59_samples.fasta
+src/validadtion/batch-wide_analysis/generated_sequences/sequences_sep/finetune_2024-09-07-10-59_samples.json
+src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_sep/chromosome.fasta
+src/validadtion/batch-wide_analysis/generated_sequences/sequences_jul_pretrain/pretrain_2024-07-22-16-18_samples.fasta
+src/validadtion/batch-wide_analysis/generated_sequences/sequences_jul_pretrain/pretrain_2024-07-22-16-18_samples.json
+src/validadtion/batch-wide_analysis/generated_sequences/sequences_feb/samples_llm_feb11.fasta

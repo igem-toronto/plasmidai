@@ -1,0 +1,52 @@
+model_name: VideoMambaPose
+
+# full_debug mode will enable a lot of information being printed
+full_debug: True
+
+seed: 42
+
+# architecture mamba
+embed_channels: 192 # number of channels after the tiny mamba layers.
+num_mamba_blocks: 12
+
+# training
+epoch_number: 300
+# batch_size: 16
+# batch_size: 8
+batch_size: 16 # just to see how scalable it is
+# learning_rate: 0.001
+learning_rate: 0.0001
+start_epoch: 1
+
+loss_type: crossentropy
+
+# device settings
+  # (should be changed depending on the model)
+num_cpus: 1
+num_gpus: 1
+parallelize: False
+
+# checkpoints
+checkpoint_directory: checkpoints/
+# checkpoint_name: 'Custom_Tanh_normalized_checkpoints'
+checkpoint_name: 'base_evo_model'
+# checkpoint_name: 'testing_false_dataset'
+
+# Follow up on the training of another previous run?
+follow_up: False
+
+  # if yes
+previous_training_epoch: 1
+previous_checkpoint: ''
+
+# data
+real_job: False
+dataset_name: 'Plasmids Fasta'
+data_path: /home/linxin67/scratch/IGEM_data/plasmids.fasta
+splits_file: projects/def-mikeuoft/linxin67/Projects/IGEM/plasmid-ai/data/splits.csv
+length_seq: 10000
+# input dimensions
+# TODO
+
+
+
