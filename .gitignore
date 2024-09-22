@@ -207,3 +207,4 @@ src/validadtion/batch-wide_analysis/generated_sequences/sequences_sep/finetune_2
 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_sep/chromosome.fasta
 src/validadtion/batch-wide_analysis/generated_sequences/sequences_jul_pretrain/pretrain_2024-07-22-16-18_samples.fasta
 src/validadtion/batch-wide_analysis/generated_sequences/sequences_jul_pretrain/pretrain_2024-07-22-16-18_samples.json
+src/validadtion/batch-wide_analysis/generated_sequences/sequences_feb/samples_llm_feb11.fasta
