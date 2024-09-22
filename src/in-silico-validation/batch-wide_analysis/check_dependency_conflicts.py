@@ -1,3 +1,7 @@
+# Description: This script checks for dependency conflicts in the installed packages.
+# the use case in the context of this library is that docker and numpy had conflicting dependencies
+# and this script was used to check for such conflicts.
+
 import subprocess
 import re
 from collections import defaultdict

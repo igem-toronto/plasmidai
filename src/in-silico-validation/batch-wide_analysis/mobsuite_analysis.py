@@ -1,6 +1,7 @@
 import os
 import docker
 import time
+from tools import *
 
 
 def format_dir_name(dir: str):
@@ -87,7 +88,14 @@ def run_mobsuite_on_fasta_files(root_dir, output_dir):
 
 
 if __name__ == "__main__":
+
     # pull the mob_suite image
     client = docker.from_env()
     client.images.pull("kbessonov/mob_suite:3.0.3")
     run_mobsuite_on_fasta_files(root_dir="generated_sequences", output_dir=os.curdir + "/mobsuite_outputs")
+
+    # optional: allign with curated database
+    print("Alligning mob_suite results")
+    alignment_results_df = allign_mobsuite_results(mobsuite_output_dir=os.curdir + "/mobsuite_outputs",
+                                                   output_dir=os.curdir + "/mobsuite_outputs")
+
