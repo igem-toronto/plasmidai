@@ -1,25 +1,48 @@
 import collections
+from typing import Dict, List, DefaultDict
 
 import jsonargparse
 import numpy as np
 import pandas as pd
 from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
 
-SEED = 16311
+SEED: int = 23
 
+def will_finetune(r: SeqRecord, path: str) -> bool:
+    """
+    Determine if a sequence record should be used for fine-tuning based on its source and characteristics.
 
-def will_finetune(r, path):
+    Args:
+        r (SeqRecord): The sequence record to evaluate.
+        path (str): The path of the input file, used to determine the sequence type.
+
+    Returns:
+        bool: True if the sequence should be used for fine-tuning, False otherwise.
+
+    Raises:
+        ValueError: If the path doesn't contain 'plasmids' or 'replicons'.
+    """
     if "plasmids" in path:
         desc = r.description.lower()
         return ("escherichia coli" in desc) and (len(r.seq) < 10000)
     elif "replicons" in path:
         return False
     else:
-        raise ValueError()
+        raise ValueError("Path must contain 'plasmids' or 'replicons'")
 
+def split_indices(n: int) -> DefaultDict[str, List[int]]:
+    """
+    Split indices into train, validation, and test sets with an 8:1:1 ratio.
 
-def split_indices(n):  # do an 8:1:1 split
-    indices = collections.defaultdict(list)
+    Args:
+        n (int): Total number of indices to split.
+
+    Returns:
+        DefaultDict[str, List[int]]: A dictionary with keys 'train', 'val', and 'test',
+                                     containing the respective indices.
+    """
+    indices: DefaultDict[str, List[int]] = collections.defaultdict(list)
 
     rng = np.random.default_rng(SEED)
     stride = 10
@@ -36,15 +59,25 @@ def split_indices(n):  # do an 8:1:1 split
 
     return indices
 
+def partition(path: str, clusters: str, out: str) -> None:
+    """
+    Partition sequences into train, validation, and test sets based on cluster information.
 
-def partition(path: str, clusters: str, out: str):
-    columns = ["centroid", "id"]
-    df = pd.read_csv(clusters, sep=r"\s+", names=columns)
+    Args:
+        path (str): Path to the input FASTA file.
+        clusters (str): Path to the cluster information file.
+        out (str): Path to save the output CSV file.
 
-    records = {r.id: r for r in SeqIO.parse(path, "fasta")}
-    singletons = set(records) - set(df["id"].unique())
-    singletons = pd.DataFrame([[i, i] for i in singletons], columns=columns)
-    df = pd.concat([df, singletons])
+    Side effects:
+        - Writes a CSV file with sequence partitions and fine-tuning information.
+    """
+    columns: List[str] = ["centroid", "id"]
+    df: pd.DataFrame = pd.read_csv(clusters, sep=r"\s+", names=columns)
+
+    records: Dict[str, SeqRecord] = {r.id: r for r in SeqIO.parse(path, "fasta")}
+    singletons: set = set(records) - set(df["id"].unique())
+    singletons_df: pd.DataFrame = pd.DataFrame([[i, i] for i in singletons], columns=columns)
+    df = pd.concat([df, singletons_df])
 
     df["n"] = 1
     df["id"] = df["id"].apply(lambda k: k + ",")  # makes it easy to recover IDs
@@ -53,7 +86,7 @@ def partition(path: str, clusters: str, out: str):
     df = df.sort_values(by="n", ascending=False)
     df = df.reset_index()
 
-    assgn = dict()
+    assgn: Dict[str, Dict[str, Union[str, int]]] = {}
     for split, indices in split_indices(len(df.index)).items():
         for idx in indices:
             cluster = df.iloc[idx]
@@ -62,11 +95,10 @@ def partition(path: str, clusters: str, out: str):
                 assgn[sid] = {"id": sid, "cluster": idx, "split": split}
 
     assert len(assgn) == len(records)
-    assgn = pd.DataFrame(list(assgn.values()))
-    assgn["finetune"] = assgn["id"].apply(lambda k: will_finetune(records[k], path))
-    assgn = assgn.sort_values(by="id").set_index("id")
-    assgn.to_csv(out)
-
+    assgn_df: pd.DataFrame = pd.DataFrame(list(assgn.values()))
+    assgn_df["finetune"] = assgn_df["id"].apply(lambda k: will_finetune(records[k], path))
+    assgn_df = assgn_df.sort_values(by="id").set_index("id")
+    assgn_df.to_csv(out)
 
 if __name__ == "__main__":
     parser = jsonargparse.ArgumentParser()

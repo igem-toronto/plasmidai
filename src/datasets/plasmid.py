@@ -2,7 +2,9 @@ import lightning.pytorch as pl
 import pandas as pd
 import torch
 from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
 from torch.utils.data import DataLoader, Dataset
+from typing import Dict, List, Tuple
 
 from src.datasets.utils import DNATokenizer
 from src.paths import DATA_ROOT
@@ -10,8 +12,20 @@ from src.utils import random_circular_crop
 
 
 class PlasmidDataset(Dataset):
+    """
+    A dataset for plasmid DNA sequences.
 
-    def __init__(self, records, tokenizer, Lmax):
+    This dataset handles loading, preprocessing, and tokenization of plasmid DNA sequences.
+    It supports random circular cropping and reverse complement augmentation.
+
+    Attributes:
+        records (List[SeqRecord]): List of SeqRecord objects containing plasmid sequences.
+        tokenizer (DNATokenizer): Tokenizer for converting DNA sequences to token IDs.
+        Lmax (int): Maximum number of tokens in the input sequence.
+        Lcrop (int): Maximum length of DNA that can be produced by Lmax tokens.
+    """
+
+    def __init__(self, records: List[SeqRecord], tokenizer: DNATokenizer, Lmax: int):
         super().__init__()
 
         self.records = list(records)
@@ -21,10 +35,10 @@ class PlasmidDataset(Dataset):
         # Maximum length of DNA that can be produced by Lmax tokens
         self.Lcrop = Lmax * max(len(x) for x in self.tokenizer.vocab)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.records)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
         record = self.records[idx]
 
         # Crop & augment
@@ -40,6 +54,19 @@ class PlasmidDataset(Dataset):
 
 
 class PlasmidDataModule(pl.LightningDataModule):
+    """
+    PyTorch Lightning DataModule for plasmid DNA sequences.
+
+    This DataModule handles the loading, splitting, and preparation of plasmid DNA data
+    for training, validation, and testing.
+
+    Attributes:
+        tokenizer_path (str): Path to the tokenizer file.
+        tokenizer (DNATokenizer): Tokenizer for converting DNA sequences to token IDs.
+        batch_size (int): Number of samples per batch.
+        num_workers (int): Number of subprocesses to use for data loading.
+        datasets (Dict[str, PlasmidDataset]): Dictionary of datasets for each split.
+    """
 
     def __init__(
         self,
@@ -56,28 +83,28 @@ class PlasmidDataModule(pl.LightningDataModule):
         self.batch_size = batch_size
         self.num_workers = num_workers
 
-        records = SeqIO.parse(DATA_ROOT / f"plasmids.fasta", "fasta")
+        records = SeqIO.parse(DATA_ROOT / "plasmids.fasta", "fasta")
         records = {r.id: r for r in records}
 
         df = pd.read_csv(DATA_ROOT / "plasmids.splits.csv")
         if finetune:
             df = df[df["finetune"]]
 
-        self.datasets = {}
+        self.datasets: Dict[str, PlasmidDataset] = {}
         for split, group in df.groupby("split"):
             examples = [records[k] for k in group["id"]]
             self.datasets[split] = PlasmidDataset(examples, self.tokenizer, Lmax=Lmax)
 
-    def train_dataloader(self):
+    def train_dataloader(self) -> DataLoader:
         return self._loader(split="train")
 
-    def val_dataloader(self):
+    def val_dataloader(self) -> DataLoader:
         return self._loader(split="val")
 
-    def test_dataloader(self):
+    def test_dataloader(self) -> DataLoader:
         return self._loader(split="test")
 
-    def _loader(self, split, shuffle=True, drop_last=True):
+    def _loader(self, split: str, shuffle: bool = True, drop_last: bool = True) -> DataLoader:
         return DataLoader(
             dataset=self.datasets[split],
             batch_size=self.batch_size,

@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal, Optional, List
 
 import jsonargparse
 import torch
@@ -24,11 +24,28 @@ def sample_loop(
     wandb_dir: str = str(LOG_DIR),
     wandb_project: str = "sample_plasmid_llm",
     wandb_entity: Optional[str] = None,
-):
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    dtype = getattr(torch, precision)
+) -> None:
+    """
+    Generate samples from a trained LitLLM model and log them to Weights & Biases.
 
-    sample_kwargs = dict(
+    Args:
+        checkpoint_path (str): Path to the model checkpoint.
+        precision (Literal["float", "half", "bfloat16"]): Precision for model computations.
+        num_samples (int): Total number of samples to generate.
+        batch_size (int): Number of samples to generate in each batch.
+        top_k (int): Top-k sampling parameter. If -1, top-k sampling is not used.
+        top_p (float): Top-p (nucleus) sampling parameter.
+        min_p (float): Minimum probability for nucleus sampling.
+        temperature (float): Sampling temperature.
+        repetition_penalty (float): Penalty for repeating tokens.
+        wandb_dir (str): Directory for Weights & Biases logs.
+        wandb_project (str): Weights & Biases project name.
+        wandb_entity (Optional[str]): Weights & Biases entity.
+    """
+    device: str = "cuda" if torch.cuda.is_available() else "cpu"
+    dtype: torch.dtype = getattr(torch, precision)
+
+    sample_kwargs: dict = dict(
         checkpoint_path=checkpoint_path,
         num_samples_per_epoch=batch_size,
         top_k=top_k,
@@ -42,11 +59,11 @@ def sample_loop(
     lit.to(device=device, dtype=dtype)
     lit.eval()
 
-    samples = []
+    samples: List[List[str]] = []
     with torch.autocast(device_type=device, dtype=dtype):
         for _ in tqdm.trange(num_samples // batch_size, desc="Sampling"):
             samples += [[x.replace(" ", "")] for x in lit._sample()]
-    table = wandb.Table(columns=["sequence"], data=samples)
+    table: wandb.Table = wandb.Table(columns=["sequence"], data=samples)
 
     wandb.init(
         project=wandb_project,
@@ -58,7 +75,13 @@ def sample_loop(
     wandb.finish()
 
 
-def sample():
+def sample() -> None:
+    """
+    Main function to set up and run the sampling process.
+
+    This function parses command-line arguments, configures the backend,
+    and calls the sample_loop function with the parsed arguments.
+    """
     parser = jsonargparse.ArgumentParser()
 
     # Populate arguments

@@ -2,24 +2,36 @@ import lightning.pytorch as pl
 import pandas as pd
 import torch
 from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
 from torch.utils.data import DataLoader, Dataset
+from typing import Dict, List, Tuple
 
 from src.datasets.utils import DNATokenizer
 from src.paths import DATA_ROOT
 
 
 class RepliconDataset(Dataset):
+    """
+    A dataset for replicon DNA sequences.
 
-    def __init__(self, records, tokenizer):
+    This dataset handles loading, preprocessing, and tokenization of replicon DNA sequences.
+    It supports reverse complement augmentation.
+
+    Attributes:
+        records (List[SeqRecord]): List of SeqRecord objects containing replicon sequences.
+        tokenizer (DNATokenizer): Tokenizer for converting DNA sequences to token IDs.
+    """
+
+    def __init__(self, records: List[SeqRecord], tokenizer: DNATokenizer):
         super().__init__()
 
         self.records = list(records)
         self.tokenizer = tokenizer
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.records)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> torch.Tensor:
         record = self.records[idx]
 
         # Crop & augment
@@ -33,6 +45,20 @@ class RepliconDataset(Dataset):
 
 
 class RepliconDataModule(pl.LightningDataModule):
+    """
+    PyTorch Lightning DataModule for replicon DNA sequences.
+
+    This DataModule handles the loading, splitting, and preparation of replicon DNA data
+    for training, validation, and testing.
+
+    Attributes:
+        tokenizer_path (str): Path to the tokenizer file.
+        tokenizer (DNATokenizer): Tokenizer for converting DNA sequences to token IDs.
+        max_tokens (int): Maximum number of tokens in a batch.
+        batch_size (int): Number of samples per batch.
+        num_workers (int): Number of subprocesses to use for data loading.
+        datasets (Dict[str, RepliconDataset]): Dictionary of datasets for each split.
+    """
 
     def __init__(
         self,
@@ -49,26 +75,26 @@ class RepliconDataModule(pl.LightningDataModule):
         self.batch_size = batch_size
         self.num_workers = num_workers
 
-        records = SeqIO.parse(DATA_ROOT / f"replicons.fasta", "fasta")
+        records = SeqIO.parse(DATA_ROOT / "replicons.fasta", "fasta")
         records = {r.id: r for r in records}
 
         df = pd.read_csv(DATA_ROOT / "replicons.splits.csv")
 
-        self.datasets = {}
+        self.datasets: Dict[str, RepliconDataset] = {}
         for split, group in df.groupby("split"):
             examples = [records[k] for k in group["id"]]
             self.datasets[split] = RepliconDataset(examples, self.tokenizer)
 
-    def train_dataloader(self):
+    def train_dataloader(self) -> DataLoader:
         return self._loader(split="train", shuffle=True, drop_last=True)
 
-    def val_dataloader(self):
+    def val_dataloader(self) -> DataLoader:
         return self._loader(split="val", shuffle=False, drop_last=False)
 
-    def test_dataloader(self):
+    def test_dataloader(self) -> DataLoader:
         return self._loader(split="test", shuffle=False, drop_last=False)
 
-    def _loader(self, split, shuffle=True, drop_last=True):
+    def _loader(self, split: str, shuffle: bool = True, drop_last: bool = True) -> DataLoader:
         return DataLoader(
             dataset=self.datasets[split],
             batch_size=self.batch_size,
@@ -79,8 +105,19 @@ class RepliconDataModule(pl.LightningDataModule):
             pin_memory=True,
         )
 
-    # e.g., [SEP] A [SEP] B [SEP] C [SEP] D [SEP]
-    def _collate(self, batch):
+    def _collate(self, batch: List[torch.Tensor]) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Custom collate function for batching replicon sequences.
+
+        This function combines multiple sequences into a single batch, truncating if necessary.
+        It also creates a mask tensor for the batch.
+
+        Args:
+            batch (List[torch.Tensor]): List of tokenized sequences.
+
+        Returns:
+            Tuple[torch.Tensor, torch.Tensor]: Batched sequences and corresponding mask.
+        """
         x0 = batch.pop(0)
         batch = [x0] + [x[1:] for x in batch]
         batch = torch.cat(batch, dim=0)[:self.max_tokens]

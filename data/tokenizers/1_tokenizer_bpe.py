@@ -1,6 +1,7 @@
 import os
 import random
-
+import argparse
+from typing import List
 from tokenizers import Tokenizer, normalizers, pre_tokenizers
 from tokenizers.models import BPE
 from tokenizers.trainers import BpeTrainer
@@ -8,34 +9,28 @@ from tokenizers.pre_tokenizers import Whitespace
 from tokenizers.processors import TemplateProcessing
 from tokenizers.normalizers import Normalizer, Replace, Lowercase
 
+def train_tokenizer(args) -> None:
+    """
+    Train a BPE tokenizer for DNA sequences and save it to a file.
 
-ROOT = '/scratch/adibvafa/plasmid-ai/'
-DATA_ROOT = f'{ROOT}/data'
-BASE_FILE = f'plasmids_replicon'
-DATASET = f'{DATA_ROOT}/{BASE_FILE}.fasta'
-DATASET_TXT = f'{DATA_ROOT}/{BASE_FILE}.txt'
-DATASET_CUTOFF = f'{DATA_ROOT}/{BASE_FILE}_cutoff.txt'
-DATASET_DUMMY =f'{DATA_ROOT}/{BASE_FILE}_dummy.txt'
-DATASET_FINETUNE = f'{DATA_ROOT}/{BASE_FILE}_finetune.txt'
-DATASET_CUTOFF_RC = f'{DATA_ROOT}/{BASE_FILE}_cutoff_rc.txt'
+    This function sets up and trains a BPE tokenizer using the HuggingFace tokenizers library.
+    It configures the tokenizer with specific normalization rules, trains it on a dataset,
+    and sets up post-processing with special tokens.
 
-TOKENIZER = f'{DATA_ROOT}/tokenizer/{BASE_FILE}_dna_bpe_tokenizer_cutoff_rc.json'
+    Args:
+        args: Parsed command-line arguments
 
-SEED = 42
-VOCAB_SIZE = 4096
-MAX_TOKEN_LENGTH = 32
-SPECIAL_TOKENS = ['[UNK]', '[SEP]', '[PAD]', '[CLS]', '[MASK]']
-
-
-if __name__ == '__main__':
-    random.seed(SEED)
+    Side effects:
+    - Sets a random seed for reproducibility
+    - Sets an environment variable for tokenizer parallelism
+    - Saves the trained tokenizer to a file specified by args.tokenizer_path
+    """
+    random.seed(args.seed)
     os.environ["TOKENIZERS_PARALLELISM"] = "1"
     print('\nTokenizer training started...\n')
 
-    # Train the SentencePiece model with HuggingFace
-    tokenizer = Tokenizer(
-        BPE(unk_token="[UNK]")
-    )
+    # Initialize the tokenizer with BPE model
+    tokenizer = Tokenizer(BPE(unk_token="[UNK]"))
 
     # Define normalizer
     tokenizer.normalizer = normalizers.Sequence([
@@ -45,25 +40,20 @@ if __name__ == '__main__':
         Replace('\t', ''),
     ])
 
-    # Define the pre-tokenizer
-    # pre_tokenizer = pre_tokenizers.Sequence([
-    #     Whitespace()
-    # ])
-
-    # Train tokenizer
+    # Configure the trainer
     trainer = BpeTrainer(
-        vocab_size=VOCAB_SIZE,
+        vocab_size=args.vocab_size,
         min_frequency=2,
         show_progress=True,
-        special_tokens=SPECIAL_TOKENS,
+        special_tokens=args.special_tokens,
         initial_alphabet=["A", "T", "C", "G"],
-        max_token_length=MAX_TOKEN_LENGTH
+        max_token_length=args.max_token_length
     )
 
-    # Train tokenizer
-    tokenizer.train([DATASET_CUTOFF_RC], trainer)
+    # Train the tokenizer
+    tokenizer.train([args.input_file], trainer)
 
-    # Set post-processor with correct special token references
+    # Set post-processor with special token references
     tokenizer.post_processor = TemplateProcessing(
         single="[SEP] $A [SEP]",
         pair="[SEP] $A [SEP] $B:1 [SEP]:1",
@@ -76,4 +66,21 @@ if __name__ == '__main__':
         ]
     )
 
-    tokenizer.save(TOKENIZER)
+    # Save the trained tokenizer
+    tokenizer.save(args.tokenizer_path)
+
+def main():
+    parser = argparse.ArgumentParser(description="Train a BPE tokenizer for DNA sequences")
+    parser.add_argument("--input_file", required=True, help="Path to the input dataset file")
+    parser.add_argument("--tokenizer_path", required=True, help="Path to save the trained tokenizer")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
+    parser.add_argument("--vocab_size", type=int, default=4096, help="Vocabulary size for the tokenizer")
+    parser.add_argument("--max_token_length", type=int, default=32, help="Maximum token length")
+    parser.add_argument("--special_tokens", nargs="+", default=['[UNK]', '[SEP]', '[PAD]', '[CLS]', '[MASK]'], 
+                        help="List of special tokens")
+
+    args = parser.parse_args()
+    train_tokenizer(args)
+
+if __name__ == '__main__':
+    main()

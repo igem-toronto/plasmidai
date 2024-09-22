@@ -1,7 +1,9 @@
-from typing import Literal, Optional
+from typing import Literal, Optional, List
 
 import jsonargparse
 import lightning.pytorch as pl
+from lightning.pytorch.callbacks import Callback
+from lightning.pytorch.loggers import Logger
 
 from src.experimental.callbacks import GradNormMonitor
 from src.experimental.lit import LitLLM
@@ -10,6 +12,12 @@ from src.utils import configure_torch_backends
 
 
 class SimpleTrainer(pl.Trainer):
+    """
+    A custom PyTorch Lightning Trainer with simplified configuration options.
+
+    This trainer extends the functionality of pl.Trainer with pre-configured callbacks
+    and logging options suitable for training language models.
+    """
 
     def __init__(
         self,
@@ -27,14 +35,34 @@ class SimpleTrainer(pl.Trainer):
         wandb_project: str = "train_plasmid_llm",
         wandb_entity: Optional[str] = None,
         checkpoint: bool = False,
-        checkpoint_dir: Optional[str] = random_checkpoint_dir(),
+        checkpoint_dir: Optional[str] = None,
     ):
-        callbacks = [pl.callbacks.ModelSummary(max_depth=2)]
+        """
+        Initialize the SimpleTrainer with custom configuration.
+
+        Args:
+            strategy (Literal["auto", "ddp"]): The training strategy to use.
+            accelerator (Literal["cpu", "gpu"]): The hardware accelerator to use.
+            devices (int): Number of devices to use for training.
+            precision (Literal["32", "16-mixed", "bf16-mixed", "bf16-true"]): Precision for training.
+            max_epochs (int): Maximum number of epochs to train.
+            train_steps_per_epoch (Optional[int]): Number of training steps per epoch.
+            val_steps_per_epoch (Optional[int]): Number of validation steps per epoch.
+            log_every_n_steps (int): Frequency of logging in steps.
+            progress_bar (bool): Whether to enable progress bar.
+            wandb (bool): Whether to use Weights & Biases for logging.
+            wandb_dir (str): Directory for Weights & Biases logs.
+            wandb_project (str): Weights & Biases project name.
+            wandb_entity (Optional[str]): Weights & Biases entity.
+            checkpoint (bool): Whether to enable checkpointing.
+            checkpoint_dir (Optional[str]): Directory for saving checkpoints.
+        """
+        callbacks: List[Callback] = [pl.callbacks.ModelSummary(max_depth=2)]
 
         if checkpoint:
             callbacks.append(
                 pl.callbacks.ModelCheckpoint(
-                    dirpath=checkpoint_dir,
+                    dirpath=checkpoint_dir or random_checkpoint_dir(),
                     filename="epoch={epoch}-loss={val/loss_finetune:.3f}",
                     auto_insert_metric_name=False,
                     monitor="val/loss",
@@ -45,6 +73,7 @@ class SimpleTrainer(pl.Trainer):
                 )
             )
 
+        logger: Union[Logger, bool] = False
         if wandb:
             logger = pl.loggers.WandbLogger(
                 project=wandb_project,
@@ -56,8 +85,6 @@ class SimpleTrainer(pl.Trainer):
                 pl.callbacks.LearningRateMonitor(),
                 GradNormMonitor(),
             ])
-        else:
-            logger = False
 
         super().__init__(
             accelerator=accelerator,
@@ -77,7 +104,13 @@ class SimpleTrainer(pl.Trainer):
         )
 
 
-def train():
+def train() -> None:
+    """
+    Main training function that sets up and runs the training process.
+
+    This function parses command-line arguments, instantiates necessary classes,
+    configures the training environment, and starts the training process.
+    """
     parser = jsonargparse.ArgumentParser()
 
     # Populate arguments

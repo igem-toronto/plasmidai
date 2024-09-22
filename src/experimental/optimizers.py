@@ -1,18 +1,41 @@
-from typing import Callable
-
+from typing import Callable, List, Tuple, Dict, Any, Optional
 import torch
 import torch.nn as nn
+from torch.optim import Optimizer
+from torch.optim.lr_scheduler import LambdaLR
 
 try:
     from mamba_ssm.ops.triton.layer_norm import RMSNorm
 except ImportError:
     print("RMSNorm not available.")
-    RMSNorm = None
+    RMSNorm: Optional[type] = None
 
 
-def build_optimizer_and_scheduler(model, lr: Callable, betas, wd, **optim_kwargs):
-    params = []
-    params_no_wd = []
+def build_optimizer_and_scheduler(
+    model: nn.Module,
+    lr: Callable[[int], float],
+    betas: Tuple[float, float],
+    wd: float,
+    **optim_kwargs: Any
+) -> Tuple[Optimizer, LambdaLR]:
+    """
+    Build an AdamW optimizer and a LambdaLR scheduler for a given model.
+
+    This function separates parameters that require weight decay from those that don't,
+    and creates an optimizer and scheduler accordingly.
+
+    Args:
+        model (nn.Module): The model whose parameters are to be optimized.
+        lr (Callable[[int], float]): A function that takes the current step and returns the learning rate.
+        betas (Tuple[float, float]): Adam's beta parameters (beta1, beta2).
+        wd (float): The weight decay to apply.
+        **optim_kwargs: Additional keyword arguments to pass to the optimizer.
+
+    Returns:
+        Tuple[Optimizer, LambdaLR]: A tuple containing the created optimizer and scheduler.
+    """
+    params: List[torch.Tensor] = []
+    params_no_wd: List[torch.Tensor] = []
 
     for name, p in model.named_parameters():
         if not p.requires_grad:
@@ -20,7 +43,7 @@ def build_optimizer_and_scheduler(model, lr: Callable, betas, wd, **optim_kwargs
         *attrs, name = name.split(".")
 
         # Get parent module
-        parent = model
+        parent: nn.Module = model
         for k in attrs:
             parent = getattr(parent, k)
 
@@ -32,7 +55,7 @@ def build_optimizer_and_scheduler(model, lr: Callable, betas, wd, **optim_kwargs
         else:
             params.append(p)
 
-    optimizer = torch.optim.AdamW(
+    optimizer: Optimizer = torch.optim.AdamW(
         params=[
             {"params": params, "weight_decay": wd},
             {"params": params_no_wd, "weight_decay": 0.0},
@@ -41,5 +64,5 @@ def build_optimizer_and_scheduler(model, lr: Callable, betas, wd, **optim_kwargs
         **optim_kwargs,
     )
 
-    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr)
+    scheduler: LambdaLR = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr)
     return optimizer, scheduler
