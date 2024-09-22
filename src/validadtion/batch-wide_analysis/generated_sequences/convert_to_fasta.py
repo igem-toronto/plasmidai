@@ -10,12 +10,18 @@ def extract_dir_name(dir: str):
         if dir[-i] == "/" or dir[-i] == "\\":
             break
     return dir[:-i]
+
+
 def whatever_to_fasta(filepath: str):
     print(f"Converting {filepath} to FASTA")
     if not os.path.isdir(filepath):
         # if the file is not a directory, then it is a file
         output_dir = extract_dir_name(filepath)
-        output_name = "/" + filepath.split("/")[-1].split(".")[0] + ".fasta" if "/" in filepath else "\\" + filepath.split("\\")[-1].split(".")[0] + ".fasta"
+        output_name = (
+            "/" + filepath.split("/")[-1].split(".")[0] + ".fasta"
+            if "/" in filepath
+            else "\\" + filepath.split("\\")[-1].split(".")[0] + ".fasta"
+        )
         with open(filepath, "r") as file:
             print(f"Reading {filepath} \t writing {output_dir + output_name}")
             with open(output_dir + output_name, "w") as fasta:
