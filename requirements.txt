@@ -1,0 +1,10 @@
+torch>=2.2
+pytorch-lightning
+wandb
+numpy
+pandas
+biopython
+jsonargparse
+transformers
+tqdm
+mamba-ssm
