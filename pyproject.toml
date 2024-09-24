@@ -1,9 +1,30 @@
-[
-build-system
-]
-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+[build-system]
+requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[
-tool.setuptools_scm
+[project]
+name = "plasmidai"
+version = "1.0.0"
+description = "The largest open-source library to develop plasmid foundation models and generate novel plasmids using machine learning."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache2.0"}
+authors = [
+    {name = "iGEM Toronto", email = "Adibvafa.fallahpour@mail.utoronto.ca"}
 ]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache2.0 License",
+    "Operating System :: OS Independent",
+]
+dependencies = []  # Will be dynamically populated from requirements.txt
+
+[project.urls]
+"Homepage" = "https://github.com/igem-toronto/plasmidai"
+
+[tool.setuptools]
+packages = {find = {}}
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+readme = {file = ["README.md"]}
