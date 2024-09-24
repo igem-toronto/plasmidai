@@ -49,6 +49,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+.ruff_cache/
 cover/
 
 # Translations
@@ -168,32 +169,6 @@ sandbox
 checkpoints
 
 outputs/
-wandb//8a74b05bb623c592f8014827fe16059ca9ec526137519570 src/validadtion/batch-wide_analysis/generated_sequences/sequences_may/samples-08-00-31-05-2024.fasta
-/5b89bb245c82e56a4b504423617e58de359939ea36908474 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_may/chromosome.fasta
-/54a6b822c98d4afee6b994bcd1b946c638ade0c935255023 src/validadtion/batch-wide_analysis/generated_sequences/sequences_mar/samples_llm_mar17.fasta
-/aa9412a895a215b6d00c8e06d14ae5c422455cee34684322 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_mar/chromosome.fasta
-/9bf41c19d9c00cfb3c21ff4e476ff3527e0cedaf22083658 src/validadtion/batch-wide_analysis/generated_sequences/sequences_july/wandb_export_2024-07-11T17_35_51.fasta
-/d249834520671d6b0777beea2cd85263af82fa0922053664 src/validadtion/plasmid_classification/new_seqs_2024-07-26.fasta
-/bd516992aa946eb2c158dad061f5df6de89fede421954778 src/validadtion/batch-wide_analysis/generated_sequences/sequences_july/wandb_export_2024-07-11T17_35_51.550-04_00.csv
-/da6500c990c16ef43effd47f0b16d37fb6f45a6a21717557 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_july/chromosome.fasta
-/cd85b6bcc121aa9c081f8fefe885f14c41edea2220628730 src/validadtion/batch-wide_analysis/generated_sequences/sequences_sep/finetune_2024-09-07-10-59_samples.fasta
-/4137ebbff62177140f3e57df55bcbc2ddebcf35120529875 src/validadtion/batch-wide_analysis/generated_sequences/sequences_sep/finetune_2024-09-07-10-59_samples.json
-/a88df7cf5d522bd72ba0ec1a1411ad98645d42a119314698 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_sep/chromosome.fasta
-/55335ffbd7bd939593eba327668882d520ece1dc17460557 src/validadtion/batch-wide_analysis/generated_sequences/sequences_jul_pretrain/pretrain_2024-07-22-16-18_samples.fasta
-/1ec6378d898426e9e8aae819616a2521ec81e1c817361702 src/validadtion/batch-wide_analysis/generated_sequences/sequences_jul_pretrain/pretrain_2024-07-22-16-18_samples.json
-37519570 src/validadtion/batch-wide_analysis/generated_sequences/sequences_may/samples-08-00-31-05-2024.fasta
-36908474 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_may/chromosome.fasta
-35255023 src/validadtion/batch-wide_analysis/generated_sequences/sequences_mar/samples_llm_mar17.fasta
-34684322 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_mar/chromosome.fasta
-22083658 src/validadtion/batch-wide_analysis/generated_sequences/sequences_july/wandb_export_2024-07-11T17_35_51.fasta
-22053664 src/validadtion/plasmid_classification/new_seqs_2024-07-26.fasta
-21954778 src/validadtion/batch-wide_analysis/generated_sequences/sequences_july/wandb_export_2024-07-11T17_35_51.550-04_00.csv
-21717557 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_july/chromosome.fasta
-20628730 src/validadtion/batch-wide_analysis/generated_sequences/sequences_sep/finetune_2024-09-07-10-59_samples.fasta
-20529875 src/validadtion/batch-wide_analysis/generated_sequences/sequences_sep/finetune_2024-09-07-10-59_samples.json
-19314698 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_sep/chromosome.fasta
-17460557 src/validadtion/batch-wide_analysis/generated_sequences/sequences_jul_pretrain/pretrain_2024-07-22-16-18_samples.fasta
-17361702 src/validadtion/batch-wide_analysis/generated_sequences/sequences_jul_pretrain/pretrain_2024-07-22-16-18_samples.json
 src/validadtion/batch-wide_analysis/generated_sequences/sequences_may/samples-08-00-31-05-2024.fasta
 src/validadtion/batch-wide_analysis/mobsuite_outputs/sequences_may/chromosome.fasta
 src/validadtion/batch-wide_analysis/generated_sequences/sequences_mar/samples_llm_mar17.fasta
