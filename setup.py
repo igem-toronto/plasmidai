@@ -25,7 +25,7 @@ setup(
     url="https://github.com/igem-toronto/plasmidai",
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: Apache2.0 License",
+        "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.10",

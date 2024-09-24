@@ -8,13 +8,13 @@ version = "1.0.0"
 description = "The largest open-source library to develop plasmid foundation models and generate novel plasmids using machine learning."
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "Apache2.0"}
+license = {text = "Apache Software License"}
 authors = [
     {name = "iGEM Toronto", email = "Adibvafa.fallahpour@mail.utoronto.ca"}
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: Apache2.0 License",
+    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
 dependencies = []  # Will be dynamically populated from requirements.txt
