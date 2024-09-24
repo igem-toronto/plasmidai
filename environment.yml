@@ -1,18 +1,10 @@
-name: plasmid-lm
+name: plasmidai
 channels:
   - conda-forge
   - pytorch
   - bioconda
 dependencies:
-  - python=3.9
-  - pytorch=2.2
-  - lightning
-  - wandb
-  - einops
-  - scipy
-  - gdown
-  - pandas
-  - biopython
-  - jsonargparse
-  - transformers
+  - python>=3.10
   - pip
+  - pip:
+      - -r requirements.txt
