@@ -15,7 +15,7 @@ def read_readme():
 
 setup(
     name="plasmidai",
-    version="1.1.0",
+    version="1.2.0",
     packages=["plasmidai"],
     author="iGEM Toronto",
     author_email="Adibvafa.fallahpour@mail.utoronto.ca",
