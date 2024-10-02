@@ -59,7 +59,7 @@ Here's a basic example of how to use Plasmid.ai:
 import plasmidai as pai
 
 # Training
-python -m plasmidai.experimental.train \
+python -m pai.experimental.train \
     --backend.matmul_precision=medium \
     --data.batch_size=64 --data.num_workers=4 \
     --lit.fused_add_norm=true --lit.scheduler_span=50000 --lit.top_p=0.9 \
@@ -70,7 +70,7 @@ python -m plasmidai.experimental.train \
     --trainer.max_epochs=175
 
 # Generation
-python -m plasmidai.experimental.sample \
+python -m pai.experimental.sample \
     --backend.matmul_precision=medium \
     --sample.checkpoint_path="${REPO_ROOT}/checkpoints/last.ckpt" \
     --sample.precision=bfloat16 --sample.num_samples=10000 --sample.top_p=0.9 \
