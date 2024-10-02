@@ -1,6 +1,7 @@
 # Plasmid.ai
 
 Plasmid.ai is the largest open-source toolkit for developing plasmid foundation models. Created by the iGEM Toronto team, this project aims to revolutionize the field of synthetic biology by leveraging machine learning to generate novel plasmids.
+<br><br>
 
 ## Table of Contents
 - [Overview](#overview)
@@ -11,10 +12,12 @@ Plasmid.ai is the largest open-source toolkit for developing plasmid foundation 
 - [Contributing](#contributing)
 - [Authors and acknowledgment](#authors-and-acknowledgment)
 - [License](#license)
+<br><br>
 
 ## Overview
 
 Plasmid.ai provides a comprehensive set of tools and models for the analysis, design, and generation of plasmids. By utilizing state-of-the-art machine learning techniques, this project enables researchers and synthetic biologists to explore new possibilities in plasmid engineering and design. For more information about our team and project, visit our [iGEM Team Wiki](https://igem.skule.ca/).
+<br><br>
 
 ## Features
 
@@ -23,6 +26,7 @@ Plasmid.ai provides a comprehensive set of tools and models for the analysis, de
 - **Advanced Sampling Techniques**: Provides cutting-edge sampling functions for generating novel plasmids based on trained models.
 - **Lightning Integration**: Seamlessly integrates with PyTorch Lightning for distributed training and model scalability.
 - **Custom Model Components**: Features specialized optimizers and callbacks for enhanced model performance.
+<br><br>
 
 ## Installation
 
@@ -45,6 +49,7 @@ cd plasmid-ai
 pip install --upgrade pip setuptools wheel
 pip install -e .
 ```
+<br>
 
 ## Usage
 
@@ -60,7 +65,7 @@ python -m plasmidai.experimental.train \
     --lit.fused_add_norm=true --lit.scheduler_span=50000 --lit.top_p=0.9 \
     --trainer.accelerator=gpu  --trainer.devices=2 --trainer.precision=bf16-mixed \
     --trainer.wandb=true --trainer.wandb_dir="${REPO_ROOT}/logs" \
-    --trainer.checkpoint=true --trainer.checkpoint_dir="${REPO_ROOT}/checkpoints/$(date +'%Y-%m-%d-%H-%M')" \
+    --trainer.checkpoint=true --trainer.checkpoint_dir="${REPO_ROOT}/checkpoints/last.ckpt" \
     --trainer.progress_bar=true \
     --trainer.max_epochs=175
 
@@ -73,6 +78,7 @@ python -m plasmidai.experimental.sample \
 
 Checkout the `slurm` directory for more examples!
 ```
+<br>
 
 ## Project Structure
 
@@ -90,16 +96,19 @@ The Plasmid.ai project is organized into several key components:
   - `train.py`: Training pipelines for plasmid models.
 - `utils.py`: Utility functions used across the project.
 - `paths.py`: Path configurations for the project.
+<br><br>
 
 
 ## Authors and acknowledgment
 
 This project is developed by the iGEM Toronto 2024 team. We would like to extend our gratitude to all the team members and contributors who have made this project possible. Special thanks to our mentors and collaborators for their guidance and support.
+<br><br>
 
 
 ## Contributing
 
 We welcome contributions from the community! Please open an issue first.
+<br><br>
 
 ## License
 
