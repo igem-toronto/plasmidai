@@ -67,7 +67,7 @@ python -m pai.experimental.train \
     --lit.fused_add_norm=true --lit.scheduler_span=50000 --lit.top_p=0.9 \
     --trainer.accelerator=gpu  --trainer.devices=2 --trainer.precision=bf16-mixed \
     --trainer.wandb=true --trainer.wandb_dir="${REPO_ROOT}/logs" \
-    --trainer.checkpoint=true --trainer.checkpoint_dir="${REPO_ROOT}/checkpoints/last.ckpt" \
+    --trainer.checkpoint=true --trainer.checkpoint_dir="${REPO_ROOT}/checkpoints" \
     --trainer.progress_bar=true \
     --trainer.max_epochs=175
 
