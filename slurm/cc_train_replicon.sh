@@ -21,7 +21,7 @@ wandb offline
 
 export TORCH_NCCL_BLOCKING_WAIT=1
 
-srun python -m src.experimental.train \
+srun python -m plasmidai.experimental.train \
     --backend.matmul_precision=medium \
     --data RepliconDataModule --data.max_tokens=131072 --data.batch_size=80 --data.num_workers=4 \
     --lit.fused_add_norm=true --lit.scheduler_span=50000 \

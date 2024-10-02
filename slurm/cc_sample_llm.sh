@@ -23,7 +23,7 @@ cd $REPO_ROOT
 
 wandb offline
 
-srun python -m src.experimental.sample \
+srun python -m plasmidai.experimental.sample \
     --backend.matmul_precision=medium \
     --sample.checkpoint_path="${REPO_ROOT}/checkpoints/57-19-30-06-2024/last.ckpt" \
     --sample.precision=bfloat16 --sample.num_samples=10000 --sample.top_p=0.9 \

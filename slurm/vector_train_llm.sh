@@ -20,7 +20,7 @@ conda activate # <YOUR_CONDA_ENVIRONMENT_NAME>
 # Change to the parent directory of your project
 cd # <PATH_TO_PARENT_DIRECTORY>
 
-srun python -m src.experimental.llm.train \
+srun python -m plasmidai.experimental.llm.train \
   --accelerator=gpu \
   --devices=1 \
   --precision=16-mixed \
