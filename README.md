@@ -29,7 +29,7 @@ pip install plasmidai
 For development or to access the latest features, you can clone the repository:
 
 ```bash
-git clone https://github.com/igem-toronto/plasmid-ai.git
+git clone https://github.com/igem-toronto/plasmidai.git
 cd plasmid-ai
 pip install -e .
 ```
