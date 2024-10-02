@@ -21,6 +21,7 @@ Plasmid.ai provides a comprehensive set of tools and models for the analysis, de
 To install the Plasmid.ai package, run the following command:
 
 ```bash
+pip install --upgrade pip setuptools wheel
 pip install plasmidai
 ```
 
@@ -31,6 +32,7 @@ For development or to access the latest features, you can clone the repository:
 ```bash
 git clone https://github.com/igem-toronto/plasmidai.git
 cd plasmid-ai
+pip install --upgrade pip setuptools wheel
 pip install -e .
 ```
 
