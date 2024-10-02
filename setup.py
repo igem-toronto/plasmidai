@@ -15,8 +15,8 @@ def read_readme():
 
 setup(
     name="plasmidai",
-    version="1.0.0",
-    packages=find_packages(),
+    version="1.1.0",
+    packages=["plasmidai"],
     author="iGEM Toronto",
     author_email="Adibvafa.fallahpour@mail.utoronto.ca",
     description="The largest open-source library to develop plasmid foundation models and generate novel plasmids using machine learning.",

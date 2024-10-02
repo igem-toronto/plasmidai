@@ -1,30 +1,53 @@
-[build-system]
-requires = ["setuptools>=45", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[project]
+[tool.poetry]
 name = "plasmidai"
-version = "1.0.0"
+version = "1.1.0"
 description = "The largest open-source library to develop plasmid foundation models and generate novel plasmids using machine learning."
+authors = ["iGEM Toronto <Adibvafa.fallahpour@mail.utoronto.ca>"]
+license = "Apache-2.0"
 readme = "README.md"
-requires-python = ">=3.10"
-license = {text = "Apache Software License"}
-authors = [
-    {name = "iGEM Toronto", email = "Adibvafa.fallahpour@mail.utoronto.ca"}
-]
+homepage = "https://github.com/igem-toronto/plasmidai"
+repository = "https://github.com/igem-toronto/plasmidai"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
-dependencies = []  # Will be dynamically populated from requirements.txt
 
-[project.urls]
-"Homepage" = "https://github.com/igem-toronto/plasmidai"
+[tool.poetry.dependencies]
+python = "^3.10"
+torch = "^2.2"
+pytorch-lightning = "*"
+packaging = "*"
+wandb = "*"
+numpy = "*"
+pandas = "*"
+biopython = "*"
+jsonargparse = "*"
+transformers = "*"
+tqdm = "*"
+wheel = "*"
+causal-conv1d = "*"
+mamba-ssm = "*"
 
-[tool.setuptools]
-packages = {find = {}}
+[tool.poetry.dev-dependencies]
+# Add any development dependencies here, e.g.:
+# pytest = "^6.2.5"
 
-[tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
-readme = {file = ["README.md"]}
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 88
+indent-width = 4
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
