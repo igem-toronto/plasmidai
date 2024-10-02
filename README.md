@@ -75,9 +75,8 @@ python -m pai.experimental.sample \
     --sample.checkpoint_path="${REPO_ROOT}/checkpoints/last.ckpt" \
     --sample.precision=bfloat16 --sample.num_samples=10000 --sample.top_p=0.9 \
     --sample.wandb_dir="${REPO_ROOT}/logs"
-
-Checkout the `slurm` directory for more examples!
 ```
+Checkout the `slurm` directory for more examples!
 <br>
 
 ## Project Structure
