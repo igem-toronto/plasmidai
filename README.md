@@ -49,10 +49,12 @@ cd plasmid-ai
 pip install --upgrade pip setuptools wheel
 pip install -e .
 ```
-<br>
+
+You can use `conda` or `poetry` to manage dependencies.
+<br><br>
+
 
 ## Usage
-
 Here's a basic example of how to use Plasmid.ai:
 
 ```python
@@ -77,7 +79,8 @@ python -m pai.experimental.sample \
     --sample.wandb_dir="${REPO_ROOT}/logs"
 ```
 Checkout the `slurm` directory for more examples!
-<br>
+<br><br>
+
 
 ## Project Structure
 
