@@ -45,7 +45,7 @@ For development or to access the latest features, you can clone the repository:
 
 ```bash
 git clone https://github.com/igem-toronto/plasmidai.git
-cd plasmid-ai
+cd plasmidai
 pip install --upgrade pip setuptools wheel
 pip install -e .
 ```
