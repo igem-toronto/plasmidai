@@ -1,4 +1,12 @@
-# Plasmid.ai
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/7c6114cf-f795-45d5-9c11-a31b3cf48f34" alt="Plasmid.ai Logo" width="30%" height="30%" style="vertical-align: middle;"/>
+</p>
+
+<p align="center">
+  <a href="https://2024.igem.wiki/utoronto/"><img src="https://img.shields.io/badge/iGEM-2024%20Wiki-00B89E?style=for-the-badge&logo=wikipedia&logoColor=white" alt="iGEM 2024 Wiki"></a>
+  <a href="https://github.com/igem-toronto/plasmidai"><img src="https://img.shields.io/badge/GitHub-Code-4A90E2?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+  <a href="https://pypi.org/project/plasmidai/"><img src="https://img.shields.io/badge/PyPI-Package-FFBF00?style=for-the-badge&logo=pypi&logoColor=white" alt="PyPI Package"></a>
+</p>
 
 Plasmid.ai is the largest open-source toolkit for developing plasmid foundation models. Created by the iGEM Toronto team, this project aims to revolutionize the field of synthetic biology by leveraging machine learning to generate novel plasmids.
 <br><br>
