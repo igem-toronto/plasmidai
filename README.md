@@ -9,8 +9,12 @@
 </p>
 
 Plasmid.ai is the largest open-source toolkit for developing plasmid foundation models. Created by the iGEM Toronto team, this project aims to revolutionize the field of synthetic biology by leveraging machine learning to generate novel plasmids.
-Our project won "Best Model" across 400+ teams from 50+ countries in iGEM Jamboree 2024.
 <br><br>
+
+## Achivements - iGEM Jamboree 2024
+- Best Model across 400+ teams from 50+ countries
+- Best project in North America
+- Top 10 globally in overgrad category
 
 ## Table of Contents
 - [Overview](#overview)
