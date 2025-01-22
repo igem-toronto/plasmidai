@@ -12,6 +12,7 @@ Plasmid.ai is the largest open-source toolkit for developing plasmid foundation 
 <br><br>
 
 ## Achievements - iGEM Jamboree 2024
+Our **PlasmidMamba** model has won:
 - [Best Model across 400+ teams from 50+ countries](https://jamboree.igem.org/2024/results/special-prizes#Best%20Model)
 - Best project in North America
 - Top 10 globally in overgrad category
